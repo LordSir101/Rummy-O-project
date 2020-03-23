@@ -13,8 +13,10 @@ const app = express();
 const port = 3000;
 
 const GameView = require('./GameView');
-const Tile = require('./Tile');
-const Player = require('./Player');
+const Tile = require('./Tile.js');
+
+var players = [];
+var waitingPlayers = [];
 
 // Assign the working directory
 const clientPath = `${__dirname}/../client`; //Note you have to use these quotes ``
@@ -26,6 +28,17 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 
+io.on('connection', (sock) => {
+  players.push(sock);
+});
+
+io.on('startGame', (sock) => {
+  waitingPlayers.push(sock);
+
+  if(waitingPlayers.length == 4){
+    var game = new GameView(waitingPlayers);
+  }
+})
 
 
 // Run the server
