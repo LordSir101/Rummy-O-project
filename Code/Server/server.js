@@ -12,6 +12,9 @@ const socketio = require('socket.io');
 const app = express();
 const port = 3000;
 
+const GameView = require('GameView.js');
+const Tile = reaquire('Tile.js');
+
 // Assign the working directory
 const clientPath = `${__dirname}/../client`; //Note you have to use these quotes ``
 console.log(`Serving from ${clientPath}`);
