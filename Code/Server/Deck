@@ -1,4 +1,19 @@
+// Deck Class
+
 class Deck {
   constructor() {
+    var suit;
+    var val;
+    this.desk = [];
+
+    const suits = ['Hearts' , 'Clubs' , 'Spades' , 'Diamonds']
+    const values = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q' , 'K']
+
+    for (suit in suits) {
+      for (val in values) {
+        this.deck.push(`${values[val]} of ${suits[suit]}`)
+      }
+    }
+    console.log(deck)
   }
 }
