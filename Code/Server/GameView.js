@@ -1,4 +1,4 @@
-const Player = require('GameView.js');
+const Player = require('./Player');
 
 class GameView{
   constructor(p1, p2, p3, p4){
@@ -7,4 +7,4 @@ class GameView{
   }
 }
 
-module.exports = Events;
+module.exports = GameView;
