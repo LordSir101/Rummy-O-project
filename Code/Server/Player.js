@@ -36,5 +36,11 @@ class Player {
       return temp;
     });
   }
+<<<<<<< Updated upstream
+=======
+
+  //sortHand
+
+>>>>>>> Stashed changes
 }
 module.exports = Player;
