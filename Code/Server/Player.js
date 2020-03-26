@@ -36,8 +36,5 @@ class Player {
       return temp;
     });
   }
-
-  sortHand
-
 }
 module.exports = Player;
