@@ -1,6 +1,6 @@
 var socket = io();
 
-var canvas = document.getElementById('canvas1');
+var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 var w = canvas.width;
@@ -13,7 +13,7 @@ window.onload = function () {
 
 // Button listener to start the game
 const addButtonListeners = () => {
-  const button = getElementById(id);
+  const button = document.getElementById('startButton');
   button.addEventListener('click', () => {
     socket.emit('startGame');
   });
@@ -37,3 +37,6 @@ function displayPlayers() {
   ctx.font = "30px Arial";
   ctx.fillText("The game has started!", 10, 50);
 }
+
+animationLoop();
+addButtonListeners();
