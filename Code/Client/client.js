@@ -13,6 +13,6 @@ window.onload = function () {
 const addButtonListeners = () => {
   const button = getElementById(id);
   button.addEventListener('click', () => {
-    socket.emit('startGame', text);
+    socket.emit('startGame');
   });
 }
