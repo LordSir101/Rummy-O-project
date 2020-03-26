@@ -17,6 +17,7 @@ const Tile = require('./Tile.js');
 
 var players = [];
 var waitingPlayers = [];
+var games = [];
 
 // Assign the working directory
 const clientPath = `${__dirname}/../client`; //Note you have to use these quotes ``
@@ -30,15 +31,38 @@ const io = socketio(server);
 
 io.on('connection', (sock) => {
   players.push(sock);
+
+  sock.on('startGame', ()=>{
+
+    waitingPlayers.push(sock);
+    //console.log(waitingPlayers);
+    if(waitingPlayers.length == 4){
+      var game = new GameView(waitingPlayers);
+      //var gameId = Math.floor(Math.random * (999999 - 000000) + 000000);
+      games.push(game);
+      /*
+      var gameId = games.indexOf(game);
+
+      games.forEach((sock) => {
+        sock.emit("gameId", gameId);
+      });*/
+
+      waitingPlayers = [];
+    }
+  });
+});
+  /*
+  sock.emit("getCookie");
+  sock.on("sendCookie", addToGame);
+
 });
 
-io.on('startGame', (sock) => {
-  waitingPlayers.push(sock);
-
-  if(waitingPlayers.length == 4){
-    var game = new GameView(waitingPlayers);
+const addToGame = (id, sock) =>{
+  if(id != ""){
+    games[id].reconnectPlayer(sock);
   }
-})
+}
+*/
 
 
 // Run the server
