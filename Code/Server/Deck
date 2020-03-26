@@ -7,13 +7,15 @@ class Deck {
     this.desk = [];
 
     const suits = ['Hearts' , 'Clubs' , 'Spades' , 'Diamonds']
-    const values = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q' , 'K']
+    const values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen' , 'King', 'Ace']
 
     for (suit in suits) {
       for (val in values) {
         this.deck.push(`${values[val]} of ${suits[suit]}`)
       }
     }
-    console.log(deck)
+    
   }
 }
+const deck = new Deck();
+console.log(deck.Deck);
