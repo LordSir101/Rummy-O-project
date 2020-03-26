@@ -40,8 +40,8 @@ class Deck {
   }
 }
 
-const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
-const values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'];
+const suits = ['Black', 'Red', 'Blue', 'Yellow'];
+const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 'Joker'];
 let deck = new Deck();
 deck.createDeck(suits, values)
 console.log(deck.shuffle());
