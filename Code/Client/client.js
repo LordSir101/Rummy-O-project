@@ -131,13 +131,14 @@ function displayPlayers() {
 }
 
 //Drag tiles around---------------------------------------------------------------------------------
-
-canvas.addEventListener('mousedown', (e)=>{
-    socket.emit("mousedown", e.clientX, e.clientY);
+const canWrap = document.getElementById("canvasWrap");
+canWrap.addEventListener('mousedown', (e)=>{
+    var offset = window.pageYOffset;
+    socket.emit("mousedown", e.clientX, e.clientY, offset);
 });
-canvas.addEventListener('mousemove', (e)=>{
+canWrap.addEventListener('mousemove', (e)=>{
   socket.emit("mousemove", e.clientX, e.clientY);
 });
-canvas.addEventListener('mouseup', (e)=>{
+canWrap.addEventListener('mouseup', (e)=>{
   socket.emit("mouseup", e.clientX, e.clientY);
 });

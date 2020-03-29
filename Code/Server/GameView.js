@@ -24,8 +24,8 @@ class GameView{
     //add event listner for each player
     //we only need mouseup event because the other players will not see other players dragging tiles around
     this.sockets.forEach((sock, idx) => {
-      sock.on('mousedown', (ex, ey) => {
-        this.__mousedown(idx, ex, ey);
+      sock.on('mousedown', (ex, ey, wo) => {
+        this.__mousedown(idx, ex, ey, wo);
       });
       sock.on('mousemove', (ex, ey) => {
         this.__mousemove(idx, ex, ey);
@@ -101,7 +101,9 @@ class GameView{
 
         if(i < player.hand.length/2){
           var posX = this.w/10 + (tile.width + 20)*i;
+
           var posY = this.h - tile.height - 90;
+
         }
         else{
           var posX = this.w/10 + (tile.width + 20)* (i - Math.floor(player.hand.length/2));
@@ -110,17 +112,19 @@ class GameView{
 
         tile.x = posX;
         tile.y = posY;
+
         //console.log(this.h);
       }
     });
   }
   //click event handlers------------------------------------------------------------------------------------
-  __mousedown(idx, ex, ey){
+  __mousedown(idx, ex, ey, wo){
+
     for(var i = 0; i < this.players[idx].hand.length; i++){
-      //console.log(e.clientX);
+
       //check if the click event is on a tile in the players hand
       if(ex > this.players[idx].hand[i].x && ex < this.players[idx].hand[i].x + this.players[idx].hand[i].width
-        && ey > this.players[idx].hand[i].y && ey < this.players[idx].hand[i].y + this.players[idx].hand[i].height){
+        && ey > this.players[idx].hand[i].y - wo && ey < this.players[idx].hand[i].y - wo + this.players[idx].hand[i].height){
 
           this.players[idx].selectedTile = this.players[idx].hand[i];
           this.players[idx].selectedIdx = i;
@@ -135,7 +139,7 @@ class GameView{
     for(var i = 0; i < this.board.length; i ++){
       //check if the click event is on a tile on the board
       if(ex > this.board[i].x && ex < this.board[i].x + this.board[i].width
-        && ey > this.board[i].y && ey < this.board[i].y + this.board[i].height){
+        && ey > this.board[i].y -wo && ey < this.board[i].y - wo + this.board[i].height){
           this.players[idx].selectedTile = this.board[i];
           this.players[idx].selectedIdx = i;
 
@@ -157,7 +161,7 @@ class GameView{
   __mouseup(idx, ex, ey){
     if(this.players[idx].dragActive){
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
-      this.players[idx].selectedTile.y = ey - this.players[idx].initialY;
+      this.players[idx].selectedTile.y = ey - this.players[idx].initialY; //+ wo;
 
       //if the player moved a tile fro thier hand, remove it and add it to the board
       if(this.players[idx].selectedTile.inHand){
