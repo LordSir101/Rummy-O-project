@@ -2,3 +2,37 @@ html, html * {
   border: 0px;
   margin: 0px;
 }
+
+button{
+  margin-top: 10%;
+  margin left: 20px;
+  width: 100%;
+  height: 40%;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: white;
+  cursor:pointer;
+  z-index: 100;
+}
+
+button:active {
+  color: white;
+  background: rgb(94,85,252);
+  background: linear-gradient(0deg, rgba(94,85,252,1) 0%, rgba(84,156,255,1) 100%);
+}
+
+.buttonWrapper{
+  text-align: center;
+  width: 15%;
+  bottom: 18%;
+}
+
+.inGame{
+  margin left: 80%;
+  width: 40%;
+  height: 35%;
+}
+
+#canvasWrap{
+  position: relative;
+}

@@ -72,7 +72,7 @@ class GameView {
   __setUp(w, h){
     this.deck.createDeck();
     this.deck.shuffle();
-    
+
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());
@@ -111,13 +111,13 @@ class GameView {
         //top row
         if(i < player.hand.length/2){
           var posX = this.w/10 + (tile.width + 20)*i;
-          var posY = this.h - tile.height - 90;
+          var posY = this.h - tile.height - 120;
 
         }
         //bottom row
         else{
           var posX = this.w/10 + (tile.width + 20)* (i - Math.floor(player.hand.length/2));
-          var posY = this.h - tile.height - 10;
+          var posY = this.h - tile.height - 30;
         }
 
         tile.x = posX;
@@ -159,6 +159,9 @@ class GameView {
         && ey > this.board[i].y -wo && ey < this.board[i].y - wo + this.board[i].height){
 
           this.players[idx].selectedTile = this.board[i];
+          //when moving a tile on the board, keep track of its initial position
+          this.players[idx].selectedTile.prevX = this.players[idx].selectedTile.x;
+          this.players[idx].selectedTile.prevY = this.players[idx].selectedTile.y;
 
           this.players[idx].initialX = ex - this.board[i].x;
           this.players[idx].initialY = ey - this.board[i].y;
@@ -182,16 +185,27 @@ class GameView {
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
       this.players[idx].selectedTile.y = ey - this.players[idx].initialY; //+ wo;
 
-      //if the player moved a tile from their hand, remove it and add it to the board
-      //This makes the tile visible to all players
-      if(this.players[idx].selectedTile.inHand){
-        //play the tile and add it to the board
+      this.players[idx].dragActive = false;
+      this.players[idx].selectedTile.snapOn(ex, ey + wo);
+
+      //if a tile is played from hand and not in an invalid position
+      var topOfHand = this.h - this.players[idx].selectedTile.height*2.2 - 90;
+      if(!this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
+          && this.players[idx].selectedTile.inHand){
+        //if the player moved a tile from their hand, remove it and add it to the board
+        //This makes the tile visible to all players
         this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
         this.players[idx].selectedTile.inHand = false;
       }
 
-      this.players[idx].dragActive = false;
-      this.players[idx].selectedTile.snapOn(ex, ey + wo);
+      //if a tile was moved from the board to an invalid position
+      else if(this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
+          && !this.players[idx].selectedTile.inHand){
+
+          //move the tile to its origional position
+          this.players[idx].selectedTile.x = this.players[idx].selectedTile.prevX;
+          this.players[idx].selectedTile.y = this.players[idx].selectedTile.prevY;
+      }
 
       //this.players[idx].playTile(this.players[idx].selectedTile);
       this.players[idx].selectedTile = null;

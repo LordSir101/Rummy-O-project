@@ -7,6 +7,8 @@ var w = canvas.width;
 var h = canvas.height;
 var animation;
 
+var background = document.createElement('img');
+background.src = "images/background.jpg";
 //game pieces
 var board = [];
 var hand = [];
@@ -80,15 +82,24 @@ function animationLoop() {
 //draw functions---------------------------------------------------------------------------------------
 // Draw canvas background
 function drawBackground() {
-  ctx.fillStyle = "blue";
-  ctx.fillRect(0, 0, w, h);
+  //ctx.fillStyle = "blue";
+  //ctx.fillRect(0, 0, w, h);
+  ctx.drawImage(background, 0,  0, w, h);
+
+  //draw the border of the hand area
+  var topOfHand = h - 70*2.2 - 90;
+  ctx.strokeStyle = "black";
+  ctx.beginPath();
+  ctx.moveTo(0, topOfHand);
+  ctx.lineTo(w, topOfHand);
+  ctx.stroke();
 }
 
 //draw the tiles in hand.  These are not visible to other players
 function drawHand(){
   for(i = 0; i < hand.length; i++){
     var tile = hand[i];
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#ffe6cc";
     ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
 
     drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
@@ -98,11 +109,12 @@ function drawHand(){
 //draw the board.  These are visible to all players
 function drawBoard(){
   for(i = 0; i < board.length; i++){
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#ffe6cc";
     var tile = board[i];
     ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
     drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
   }
+
 }
 
 //draw the values and color of the cards
@@ -131,6 +143,7 @@ canWrap.addEventListener('mousedown', (e)=>{
     //offeset is the amount of pixels the user scrolled down.
     //scrolling down changes where the cards are drawn, but not thier hitboxes
     var offset = window.pageYOffset;
+    console.log(e.clientY)
     socket.emit("mousedown", e.clientX, e.clientY, offset);
 });
 canWrap.addEventListener('mousemove', (e)=>{
