@@ -30,8 +30,8 @@ class GameView {
       sock.on('mousemove', (ex, ey) => {
         this.__mousemove(idx, ex, ey);
       });
-      sock.on('mouseup', (ex, ey) => {
-        this.__mouseup(idx, ex, ey);
+      sock.on('mouseup', (ex, ey, wo) => {
+        this.__mouseup(idx, ex, ey, wo);
       });
       sock.on('sortValue', () => {
         this.players[idx].sortHandByValue();
@@ -165,7 +165,7 @@ class GameView {
     }
   }
 
-  __mouseup(idx, ex, ey){
+  __mouseup(idx, ex, ey, wo){
     if(this.players[idx].dragActive){
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
       this.players[idx].selectedTile.y = ey - this.players[idx].initialY; //+ wo;
@@ -178,7 +178,7 @@ class GameView {
       }
 
       this.players[idx].dragActive = false;
-      this.players[idx].selectedTile.snapOn(ex, ey);
+      this.players[idx].selectedTile.snapOn(ex, ey + wo);
 
       //this.players[idx].playTile(this.players[idx].selectedTile);
       this.players[idx].selectedTile = null;

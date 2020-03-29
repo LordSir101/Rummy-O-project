@@ -146,5 +146,6 @@ canWrap.addEventListener('mousemove', (e)=>{
   socket.emit("mousemove", e.clientX, e.clientY);
 });
 canWrap.addEventListener('mouseup', (e)=>{
-  socket.emit("mouseup", e.clientX, e.clientY);
+  var offset = window.pageYOffset;
+  socket.emit("mouseup", e.clientX, e.clientY, offset);
 });
