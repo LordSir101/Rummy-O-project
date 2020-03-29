@@ -25,19 +25,27 @@ class Player {
     return tile;
   }
 
+  // For testing only
+  removeTile (tile) {
+    const index = this.hand.indexOf(tile);
+    if (index > -1) {
+      this.hand.splice(index, 1);
+    }
+  }
+
   sortHandByValue () {
     this.hand.sort((a, b) => {
       let temp = 4 * (a.value - b.value);
-      let colors = {"Red": 0, "Blue": 1, "Yellow": 2, "Green": 3 };
-      temp += (colors[a.color] - colors[b.color]);
+      let colors = {"black": 0, "red": 1, "blue": 2, "yellow": 3 };
+      temp += (colors[a.suit] - colors[b.suit]);
       return temp;
     });
   }
 
   sortHandByColor () {
     this.hand.sort((a, b) => {
-      let colors = {"Red": 0, "Blue": 1, "Yellow": 2, "Green": 3 };
-      let temp = 13 * (colors[a.color] - colors[b.color]);
+      let colors = {"black": 0, "red": 1, "blue": 2, "yellow": 3 };
+      let temp = 13 * (colors[a.suit] - colors[b.suit]);
       temp += (a.value - b.value);
       return temp;
     });

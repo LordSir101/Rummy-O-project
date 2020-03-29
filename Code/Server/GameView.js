@@ -1,8 +1,8 @@
 const Player = require('./Player');
 const Deck = require('./Deck');
 
-class GameView{
-  constructor(sockets){
+class GameView {
+  constructor(sockets) {
     this.sockets = sockets;
     this.players = [];
     this.w;
@@ -31,8 +31,15 @@ class GameView{
       sock.on('mousemove', (ex, ey) => {
         this.__mousemove(idx, ex, ey);
       });
-      sock.on('mouseup', (ex, ey) => {
-        this.__mouseup(idx, ex, ey);
+      sock.on('mouseup', (ex, ey, wo) => {
+        this.__mouseup(idx, ex, ey, wo);
+      });
+      sock.on('sortValue', () => {
+        this.players[idx].sortHandByValue();
+      });
+      sock.on('sortColor', () => {
+        this.players[idx].sortHandByColor();
+
       });
     });
 
@@ -64,7 +71,8 @@ class GameView{
   //Game setup------------------------------------------------------------------------------------------------
   __setUp(w, h){
     this.deck.createDeck();
-
+    this.deck.shuffle();
+    
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());
@@ -168,7 +176,7 @@ class GameView{
     }
   }
 
-  __mouseup(idx, ex, ey){
+  __mouseup(idx, ex, ey, wo){
     if(this.players[idx].dragActive){
       //set the position of the card
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
@@ -182,10 +190,14 @@ class GameView{
         this.players[idx].selectedTile.inHand = false;
       }
 
-      this.players[idx].selectedTile = null;
       this.players[idx].dragActive = false;
+      this.players[idx].selectedTile.snapOn(ex, ey + wo);
+
+      //this.players[idx].playTile(this.players[idx].selectedTile);
+      this.players[idx].selectedTile = null;
     }
   }
+
 
 
 }

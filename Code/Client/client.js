@@ -61,8 +61,14 @@ button.addEventListener('click', () => {
   console.log("pressed");
   socket.emit('startGame');
 });
-
-
+const sortValue = document.getElementById("sortValue");
+sortValue.addEventListener("click", () => {
+  socket.emit('sortValue');
+});
+const sortColor = document.getElementById("sortColor");
+sortColor.addEventListener("click", () => {
+  socket.emit('sortColor');
+});
 // Main animation loop
 function animationLoop() {
   drawBackground();
@@ -131,5 +137,6 @@ canWrap.addEventListener('mousemove', (e)=>{
   socket.emit("mousemove", e.clientX, e.clientY);
 });
 canWrap.addEventListener('mouseup', (e)=>{
-  socket.emit("mouseup", e.clientX, e.clientY);
+  var offset = window.pageYOffset;
+  socket.emit("mouseup", e.clientX, e.clientY, offset);
 });
