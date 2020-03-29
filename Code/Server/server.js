@@ -32,6 +32,7 @@ const io = socketio(server);
 io.on('connection', (sock) => {
   players.push(sock);
 
+  //called when player presses start button
   sock.on('startGame', ()=>{
 
     waitingPlayers.push(sock);
