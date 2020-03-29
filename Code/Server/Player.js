@@ -3,6 +3,13 @@ class Player {
   constructor(){
     this.hand = [];
     this.score = 0;
+
+    //for drag events
+    this.selectedTile = null;
+    this.selectedIdx;
+    this.initialX;
+    this.initialY;
+    this.dragActive = false;
   }
 
 
@@ -36,11 +43,8 @@ class Player {
       return temp;
     });
   }
-<<<<<<< Updated upstream
-=======
 
   //sortHand
 
->>>>>>> Stashed changes
 }
 module.exports = Player;

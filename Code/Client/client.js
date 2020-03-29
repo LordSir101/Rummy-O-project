@@ -7,6 +7,16 @@ var w = canvas.width;
 var h = canvas.height;
 var animation;
 
+var dragActive = false;
+
+//game pieces
+var board = [];
+var hand = [];
+
+//for dragging
+var intialX;
+var intialY;
+
 window.onload = function () {
   console.log("client.js successfully loaded!");
 };
@@ -24,7 +34,13 @@ socket.on("getCookie", ()=>{
 });*/
 
 socket.on("startAnimation", ()=>{
+  socket.emit("canvasDim", w, h);
   animationLoop();
+});
+
+socket.on('tilePos', (playerHand, gameBoard)=>{
+  hand = playerHand;
+  board = gameBoard;
 });
 /*
 function getCookie(cname) {
@@ -51,10 +67,13 @@ button.addEventListener('click', () => {
   socket.emit('startGame');
 });
 
+
 // Main animation loop
 function animationLoop() {
   drawBackground();
-  displayPlayers();
+  //displayPlayers();
+  drawHand();
+  drawBoard();
   animation = requestAnimationFrame(animationLoop);
 }
 
@@ -64,9 +83,61 @@ function drawBackground() {
   ctx.fillRect(0, 0, w, h);
 }
 
+function drawHand(){
+
+  for(i = 0; i < hand.length; i++){
+    var tile = hand[i];
+    ctx.fillStyle = "white";
+    ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
+
+    drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
+  }
+}
+
+function drawBoard(){
+
+  for(i = 0; i < board.length; i++){
+    ctx.fillStyle = "white";
+    var tile = board[i];
+    ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
+    drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
+  }
+}
+
+function drawNumber(x, y, width, height, suit, value){
+  //draw number
+  ctx.fillStyle = suit;
+  ctx.font = "30px Verdana"
+  ctx.textAlign = 'left'; //bases the poition of the text from the top left corner
+  ctx.textBaseline = 'top';
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "black";
+
+  var text = value + "";
+  var length = ctx.measureText(text).width;
+
+  var xpos = x + width/2 - length/2
+  var ypos = y + height/2 - 10
+
+  ctx.strokeText(text, xpos, ypos);
+  ctx.fillText(text, xpos, ypos);
+}
+
 // Displays the connected players
 function displayPlayers() {
   ctx.font = "30px Arial";
   ctx.fillStyle = "white";
   ctx.fillText("The game has started!", 10, 50);
 }
+
+//Drag tiles around---------------------------------------------------------------------------------
+
+canvas.addEventListener('mousedown', (e)=>{
+    socket.emit("mousedown", e.clientX, e.clientY);
+});
+canvas.addEventListener('mousemove', (e)=>{
+  socket.emit("mousemove", e.clientX, e.clientY);
+});
+canvas.addEventListener('mouseup', (e)=>{
+  socket.emit("mouseup", e.clientX, e.clientY);
+});
