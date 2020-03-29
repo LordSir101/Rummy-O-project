@@ -7,16 +7,12 @@ var w = canvas.width;
 var h = canvas.height;
 var animation;
 
-var dragActive = false;
-
 //game pieces
 var board = [];
 var hand = [];
 
-//for dragging
-var intialX;
-var intialY;
 
+//setup-----------------------------------------------------------------------------------------------------
 window.onload = function () {
   console.log("client.js successfully loaded!");
 };
@@ -37,7 +33,7 @@ socket.on("startAnimation", ()=>{
   socket.emit("canvasDim", w, h);
   animationLoop();
 });
-
+//recieves the cards in the player's hand as well as the board
 socket.on('tilePos', (playerHand, gameBoard)=>{
   hand = playerHand;
   board = gameBoard;
@@ -60,7 +56,6 @@ function getCookie(cname) {
 }*/
 
 // Button listener to start the game
-//const addButtonListeners = () => {
 const button = document.getElementById("startButton");
 button.addEventListener('click', () => {
   console.log("pressed");
@@ -71,20 +66,20 @@ button.addEventListener('click', () => {
 // Main animation loop
 function animationLoop() {
   drawBackground();
-  //displayPlayers();
   drawHand();
   drawBoard();
   animation = requestAnimationFrame(animationLoop);
 }
 
+//draw functions---------------------------------------------------------------------------------------
 // Draw canvas background
 function drawBackground() {
   ctx.fillStyle = "blue";
   ctx.fillRect(0, 0, w, h);
 }
 
+//draw the tiles in hand.  These are not visible to other players
 function drawHand(){
-
   for(i = 0; i < hand.length; i++){
     var tile = hand[i];
     ctx.fillStyle = "white";
@@ -94,8 +89,8 @@ function drawHand(){
   }
 }
 
+//draw the board.  These are visible to all players
 function drawBoard(){
-
   for(i = 0; i < board.length; i++){
     ctx.fillStyle = "white";
     var tile = board[i];
@@ -104,8 +99,8 @@ function drawBoard(){
   }
 }
 
+//draw the values and color of the cards
 function drawNumber(x, y, width, height, suit, value){
-  //draw number
   ctx.fillStyle = suit;
   ctx.font = "30px Verdana"
   ctx.textAlign = 'left'; //bases the poition of the text from the top left corner
@@ -123,16 +118,12 @@ function drawNumber(x, y, width, height, suit, value){
   ctx.fillText(text, xpos, ypos);
 }
 
-// Displays the connected players
-function displayPlayers() {
-  ctx.font = "30px Arial";
-  ctx.fillStyle = "white";
-  ctx.fillText("The game has started!", 10, 50);
-}
 
 //Drag tiles around---------------------------------------------------------------------------------
 const canWrap = document.getElementById("canvasWrap");
 canWrap.addEventListener('mousedown', (e)=>{
+    //offeset is the amount of pixels the user scrolled down.
+    //scrolling down changes where the cards are drawn, but not thier hitboxes
     var offset = window.pageYOffset;
     socket.emit("mousedown", e.clientX, e.clientY, offset);
 });

@@ -12,17 +12,18 @@ class GameView{
     this.deck = new Deck();
     this.board = [];
 
+    //set an event listener to start animation loop on each client
     this.sockets.forEach((sock, i) => {
       this.players[i] = new Player();
       sock.emit("startAnimation");
       sock.on("canvasDim", (w, h)=>{
+        //this ensures the setup function is only called once
         if(!this.setup){this.__setUp(w, h);}
 
       });
     });
 
-    //add event listner for each player
-    //we only need mouseup event because the other players will not see other players dragging tiles around
+    //add event listners for each player
     this.sockets.forEach((sock, idx) => {
       sock.on('mousedown', (ex, ey, wo) => {
         this.__mousedown(idx, ex, ey, wo);
@@ -63,7 +64,7 @@ class GameView{
   //Game setup------------------------------------------------------------------------------------------------
   __setUp(w, h){
     this.deck.createDeck();
-    //console.log(h);
+
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());
@@ -82,29 +83,30 @@ class GameView{
       sock.emit("tilePos", this.players[i].hand, this.board);
     });
 
-    //re draw the hand so it looks nice
+    //we want to constantly update the position of the cards in hand to respond to any changes
     this.__setHandPos();
   }
 
-  //set hand position
-  //when a tile gets moved out of a player's hand, the rest of teh tiles will move
+  //set hand position---------------------------------------------------------------------------------------
+  //Everytime a card moves out of a players hand, the positions are readjusted to fill up the space
   __setHandPos(){
 
     this.players.forEach((player, i) => {
       for(var i = 0; i < player.hand.length; i++){
         var tile = player.hand[i];
 
-        //if the player is currently moving a tile, do not reset its position
+        //if the player is currently moving a tile, do not reset that tile's position
         if(player.selectedTile == tile){
           continue;
         }
 
+        //top row
         if(i < player.hand.length/2){
           var posX = this.w/10 + (tile.width + 20)*i;
-
           var posY = this.h - tile.height - 90;
 
         }
+        //bottom row
         else{
           var posX = this.w/10 + (tile.width + 20)* (i - Math.floor(player.hand.length/2));
           var posY = this.h - tile.height - 10;
@@ -113,22 +115,28 @@ class GameView{
         tile.x = posX;
         tile.y = posY;
 
-        //console.log(this.h);
       }
     });
   }
+
   //click event handlers------------------------------------------------------------------------------------
   __mousedown(idx, ex, ey, wo){
 
+    //wo is the window offset
     for(var i = 0; i < this.players[idx].hand.length; i++){
-
       //check if the click event is on a tile in the players hand
+      //we need to subtract the window offset to make the card's hitbox line up with where the
+      //card is being drawn
       if(ex > this.players[idx].hand[i].x && ex < this.players[idx].hand[i].x + this.players[idx].hand[i].width
         && ey > this.players[idx].hand[i].y - wo && ey < this.players[idx].hand[i].y - wo + this.players[idx].hand[i].height){
 
+          //selected tile is a pointer to a tile that the player has selected.
+          //this lets us use that tile in other event handlers
           this.players[idx].selectedTile = this.players[idx].hand[i];
-          this.players[idx].selectedIdx = i;
 
+          //we set inital x and y so that the card can move relative to where the user clicked
+          //If the user clicks in the middle of a card, the middle of the card follows the cursor
+          //If the user clicks near the left of the card, the left follows the cursor
           this.players[idx].initialX = ex - this.players[idx].hand[i].x;
           this.players[idx].initialY = ey - this.players[idx].hand[i].y;
 
@@ -136,12 +144,13 @@ class GameView{
         }
     }
 
+    //check if the click event is on a tile on the board.
+    //Card movment is handled the same as above
     for(var i = 0; i < this.board.length; i ++){
-      //check if the click event is on a tile on the board
       if(ex > this.board[i].x && ex < this.board[i].x + this.board[i].width
         && ey > this.board[i].y -wo && ey < this.board[i].y - wo + this.board[i].height){
+
           this.players[idx].selectedTile = this.board[i];
-          this.players[idx].selectedIdx = i;
 
           this.players[idx].initialX = ex - this.board[i].x;
           this.players[idx].initialY = ey - this.board[i].y;
@@ -151,6 +160,7 @@ class GameView{
     }
   }
 
+  //The card sprite will follow the cursor based on the initial click
   __mousemove(idx, ex, ey){
     if(this.players[idx].dragActive){
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
@@ -160,14 +170,16 @@ class GameView{
 
   __mouseup(idx, ex, ey){
     if(this.players[idx].dragActive){
+      //set the position of the card
       this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
       this.players[idx].selectedTile.y = ey - this.players[idx].initialY; //+ wo;
 
-      //if the player moved a tile fro thier hand, remove it and add it to the board
+      //if the player moved a tile from their hand, remove it and add it to the board
+      //This makes the tile visible to all players
       if(this.players[idx].selectedTile.inHand){
-        this.board.push(this.players[idx].selectedTile);
+        //play the tile and add it to the board
+        this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
         this.players[idx].selectedTile.inHand = false;
-        this.players[idx].hand.splice(this.players[idx].selectedIdx, 1);
       }
 
       this.players[idx].selectedTile = null;

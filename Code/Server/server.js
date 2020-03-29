@@ -36,7 +36,8 @@ io.on('connection', (sock) => {
   sock.on('startGame', ()=>{
 
     waitingPlayers.push(sock);
-    //console.log(waitingPlayers);
+
+    //If there are 4 waiting players, start the game
     if(waitingPlayers.length == 4){
       var game = new GameView(waitingPlayers);
       //var gameId = Math.floor(Math.random * (999999 - 000000) + 000000);
@@ -47,7 +48,6 @@ io.on('connection', (sock) => {
       games.forEach((sock) => {
         sock.emit("gameId", gameId);
       });*/
-
       waitingPlayers = [];
     }
   });

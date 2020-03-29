@@ -12,7 +12,6 @@ class Player {
     this.dragActive = false;
   }
 
-
   addTile (tile) {
     this.hand.push(tile);
   }
