@@ -1,22 +1,32 @@
 class Card {
-  constructor(suits, values) {
-    this.suit = suits;
-    this.value = values;
+  constructor(suit, value) {
+    this.suit = suit;
+    this.value = value;
     this.x;
     this.y;
     this.width = 50;
     this.height = 70;
     this.inHand = true;
+  }
 
+  snapOn(ex, ey) {
+    this.x = ex - (ex % (this.width + 20));
+    this.y = ey - (ey % (this.height + 10));
   }
 }
 
 class Deck {
   constructor() {
     this.deck = [];
+    this.values = [];
     this.suits = ['black', 'red', 'blue', 'yellow'];
-    this.values = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13];
-
+    for (var i = 1; i <= 13; i++) {
+      let j = 1;
+      while (j % 5 != 0) {
+        this.values.push(i);
+        j++;
+      }
+    }
   }
 
   createDeck(suits, values) {
@@ -29,6 +39,7 @@ class Deck {
     this.deck.push(new Card('black', 'J'))
     return this.deck;
   }
+
   deal () {
     return this.deck.pop();
     /*let give = [];

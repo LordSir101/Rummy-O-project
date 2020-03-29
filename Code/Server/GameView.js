@@ -1,8 +1,8 @@
 const Player = require('./Player');
 const Deck = require('./Deck');
 
-class GameView{
-  constructor(sockets){
+class GameView {
+  constructor(sockets) {
     this.sockets = sockets;
     this.players = [];
     this.w;
@@ -32,6 +32,13 @@ class GameView{
       });
       sock.on('mouseup', (ex, ey) => {
         this.__mouseup(idx, ex, ey);
+      });
+      sock.on('sortValue', () => {
+        this.players[idx].sortHandByValue();
+      });
+      sock.on('sortColor', () => {
+        this.players[idx].sortHandByColor();
+
       });
     });
 
@@ -63,6 +70,7 @@ class GameView{
   //Game setup------------------------------------------------------------------------------------------------
   __setUp(w, h){
     this.deck.createDeck();
+    this.deck.shuffle();
     //console.log(h);
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
@@ -121,7 +129,6 @@ class GameView{
       //check if the click event is on a tile in the players hand
       if(ex > this.players[idx].hand[i].x && ex < this.players[idx].hand[i].x + this.players[idx].hand[i].width
         && ey > this.players[idx].hand[i].y && ey < this.players[idx].hand[i].y + this.players[idx].hand[i].height){
-
           this.players[idx].selectedTile = this.players[idx].hand[i];
           this.players[idx].selectedIdx = i;
 
@@ -166,10 +173,14 @@ class GameView{
         this.players[idx].hand.splice(this.players[idx].selectedIdx, 1);
       }
 
-      this.players[idx].selectedTile = null;
       this.players[idx].dragActive = false;
+      this.players[idx].selectedTile.snapOn(ex, ey);
+
+      //this.players[idx].playTile(this.players[idx].selectedTile);
+      this.players[idx].selectedTile = null;
     }
   }
+
 
 
 }
