@@ -9,13 +9,13 @@ class Meld {
     this.width = 52;
   }
 
-  addTile (tile) {
+  addTile (tile, board) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
     if (tile.suit == last.suit && tile.value == last.value + 1) {
       this.tiles.push(tile);
       this.width += (tile.width + 2);
-    } else if (tile.suit == first.suit && tile.value == first.value + 1) {
+    } else if (tile.suit == first.suit && tile.value == first.value - 1) {
       this.tiles.unshift(tile);
       this.x -= tile.width;
       this.width += (tile.width + 2);
@@ -23,29 +23,117 @@ class Meld {
       this.tiles.push(tile);
       this.width += (tile.width + 2);
     }
+
+    board.push(tile); //push to board so it is drawn when being dragged
+    this.drawMeld();
+  }
+
+  drawMeld(){
     for (let i = 0; i < this.tiles.length; i++) {
-      this.tiles[i].x = this.x + (tile.width + 2) * i;
+      this.tiles[i].x = this.x + (this.tiles[i].width + 2) * i;
     }
+  }
+
+  removeTile(tile){
+    /*
+    if(tile != this.tiles[0] && tile != this.tiles[this.tiles.length - 1]){
+      return null;
+    }*/
+    /*
+
+    if(!this.checkIfMeldValid(idx)){
+      return null;
+    }
+    else{*/
+    var idx = this.tiles.indexOf(tile);
+      if(idx == 0){
+        this.x = this.tiles[1].x;
+        this.y = this.tiles[1].y;
+      }
+      this.tiles.splice(idx, 1);
+      this.width -= (tile.width + 2);
+      this.drawMeld();
+    //}
+
+    return tile;
   }
 
   isValid (tile) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
+
     if ((tile.suit == last.suit && tile.value == last.value + 1)
-       || (tile.suit == first.suit && tile.value == first.value + 1)
+       || (tile.suit == first.suit && tile.value == first.value - 1)
        || (tile.value == first.value && tile.value == last.value)) {
       return true
     }
     return false;
   }
 
+  checkIfMeldValid(idx){
+    /*
+    var test = [];
+    this.tiles.forEach((tile) => {
+      test.push(tile);
+    });
+
+    test.splice(idx, 1);*/
+    //console.log(test);
+    var test = [];
+    this.tiles.forEach((tile) => {
+      test.push(tile);
+    });
+    var median;
+    var mean;
+    var value = 0;
+    var suit = test[0].suit;
+    var val = test[0].value;
+    var sameSuit = true;
+    var sameVal = true;
+
+    //get the sum of values and checks if the set is the same suit or same number
+    for(var i = 0; i < test.length; i++){
+      value += test[i].value;
+      if(test[i].suit != suit){
+        sameSuit = false;
+      }
+      if(test[i].value != val){
+        sameVal = false;
+      }
+    }
+    mean = value / test.length;
+
+    if(test.length % 2 ==0){
+      var num1 = test[(test.length)/2].value;
+      var num2 = test[(test.length)/2 -1].value;
+      median = (num1 + num2) /2;
+
+    }
+    else{
+      median = test[(test.length-1)/2].value;
+
+    }
+
+    //a set of consecutive numbers will have the same mean and median
+    if(mean == median && sameSuit && test.length >= 3){
+      return true;
+    }
+    //check for a three of a kind of different suit
+    else if(!sameSuit && sameVal && test.length >= 3){
+      return true;
+    }
+    return false;
+  }
+
   // return true if mouse is within its bounds
   onMeld (ex, ey) {
+    console.log("ex " + ex);
+    console.log("ey " + ey);
     if ((ex < this.x + this.width && ex > this.x)
       && (ey < this.y + this.tiles[0].height && ey > this.y)) {
         return true;
     }
-    return flase;
+    return false;
   }
 }
 

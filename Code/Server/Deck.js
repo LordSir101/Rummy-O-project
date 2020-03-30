@@ -9,6 +9,7 @@ class Card {
     this.width = 50;
     this.height = 70;
     this.inHand = true;
+    this.inMeld = false;
   }
 
   snapOn(ex, ey, w) {

@@ -94,6 +94,11 @@ class GameView {
 
     //we want to constantly update the position of the cards in hand to respond to any changes
     this.__setHandPos();
+    /*
+    this.melds.forEach((meld) => {
+      meld.drawMeld();
+    });*/
+
   }
 
   //set hand position---------------------------------------------------------------------------------------
@@ -170,6 +175,35 @@ class GameView {
           this.players[idx].dragActive = true;
         }
     }
+
+    //check if the click event is on a tile in a meld.
+    for(var i = 0; i < this.melds.length; i ++){
+      for(var j = 0; j < this.melds[i].tiles.length; j++){
+        if(ex > this.melds[i].tiles[j].x && ex < this.melds[i].tiles[j].x + this.melds[i].tiles[j].width
+          && ey > this.melds[i].tiles[j].y -wo && ey < this.melds[i].tiles[j].y - wo + this.melds[i].tiles[j].height){
+
+            //remove tile from meld
+            this.players[idx].selectedTile = this.melds[i].removeTile(this.melds[i].tiles[j]);
+
+            //if(this.players[idx].selectedTile != null){
+              //this.players[idx].selectedTile.inMeld = true;
+              //when moving a tile on the board, keep track of its initial position
+            this.players[idx].selectedTile.prevX = this.players[idx].selectedTile.x;
+            this.players[idx].selectedTile.prevY = this.players[idx].selectedTile.y;
+
+            this.players[idx].initialX = ex - this.players[idx].selectedTile.x;
+            this.players[idx].initialY = ey - this.players[idx].selectedTile.y;
+
+            //this.board.push(this.players[idx].selectedTile);
+              //this.melds[i].drawMeld();
+
+            this.players[idx].dragActive = true;
+            //}
+
+          }
+      }
+
+    }
   }
 
   //The card sprite will follow the cursor based on the initial click
@@ -192,35 +226,59 @@ class GameView {
 
       //if a tile is played from hand and not in an invalid position
       var topOfHand = this.h - this.players[idx].selectedTile.height*2.2 - 90;
-      if(!this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
-          && this.players[idx].selectedTile.inHand){
+      if(!this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)){
         //if the player moved a tile from their hand, remove it and add it to the board
         //This makes the tile visible to all players
 
         // Check if the player is overlapping a meld
         for (let i = 0; i < this.melds.length; i++) {
+          //if overlap and valid
           if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(this.players[idx].selectedTile)) {
-            overlappingMeld.addTile(this.players[idx].selectedTile);
+            this.melds[i].addTile(this.players[idx].selectedTile, this.board);
+            this.players[idx].selectedTile.inMeld = true;
             this.players[idx].playTile(this.players[idx].selectedTile);
-            this.players[idx].selectedTile.inHand = false;
+
+            if(this.players[idx].selectedTile.inHand){
+              this.players[idx].selectedTile.inHand = false;
+            }
             this.players[idx].selectedTile = null;
             return;
           }
+          //if overlap and not valid
+          if (this.melds[i].onMeld(ex, ey + wo) && !this.melds[i].isValid(this.players[idx].selectedTile)) {
+
+            if(!this.players[idx].selectedTile.inHand){
+              this.players[idx].selectedTile.x = this.players[idx].selectedTile.prevX;
+              this.players[idx].selectedTile.y = this.players[idx].selectedTile.prevY;
+            }
+
+            this.players[idx].selectedTile = null;
+            //we return here because all meld tiles are now board tiles as well
+            return;
+          }
+
         }
 
         // Check if the player is overlapping a board tile
         var overlap = this.players[idx].selectedTile.overlapsTile(this.board);
         if (overlap != null) {
+
+          //overlap becomes the first tile in the meld
           let meld = new Meld(overlap);
           if (meld.isValid(this.players[idx].selectedTile)) {
-            meld.addTile(this.players[idx].selectedTile);
+            meld.addTile(this.players[idx].selectedTile, this.board);
+            this.players[idx].selectedTile.inMeld = true;
             this.melds.push(meld);
-            this.players[idx].playTile(this.players[idx].selectedTile);
-            this.players[idx].selectedTile.inHand = false;
+            if(this.players[idx].selectedTile.inHand){
+              this.players[idx].playTile(this.players[idx].selectedTile);
+              this.players[idx].selectedTile.inHand = false;
+            }
           }
         } else {
-          this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
-          this.players[idx].selectedTile.inHand = false;
+          if(this.players[idx].selectedTile.inHand){
+            this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
+            this.players[idx].selectedTile.inHand = false;
+          }
         }
 
       }
