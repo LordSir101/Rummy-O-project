@@ -1,5 +1,6 @@
 const Player = require('./Player');
 const Deck = require('./Deck');
+const Meld = require('./Meld');
 
 class GameView {
   constructor(sockets) {
@@ -11,7 +12,7 @@ class GameView {
 
     this.deck = new Deck();
     this.board = [];
-
+    this.melds = [];
     //set an event listener to start animation loop on each client
     this.sockets.forEach((sock, i) => {
       this.players[i] = new Player();
@@ -88,7 +89,7 @@ class GameView {
   __update(){
     this.sockets.forEach((sock, i) => {
       //send the players' hand and game board positions
-      sock.emit("tilePos", this.players[i].hand, this.board);
+      sock.emit("tilePos", this.players[i].hand, this.board, this.melds);
     });
 
     //we want to constantly update the position of the cards in hand to respond to any changes
@@ -188,16 +189,41 @@ class GameView {
       this.players[idx].dragActive = false;
       this.players[idx].selectedTile.snapOn(ex, ey + wo);
 
+
       //if a tile is played from hand and not in an invalid position
       var topOfHand = this.h - this.players[idx].selectedTile.height*2.2 - 90;
       if(!this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
           && this.players[idx].selectedTile.inHand){
         //if the player moved a tile from their hand, remove it and add it to the board
         //This makes the tile visible to all players
-        this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
-        this.players[idx].selectedTile.inHand = false;
-      }
 
+        // Check if the player is overlapping a meld
+        for (let i = 0; i < this.melds.length; i++) {
+          if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(this.players[idx].selectedTile)) {
+            overlappingMeld.addTile(this.players[idx].selectedTile);
+            this.players[idx].playTile(this.players[idx].selectedTile);
+            this.players[idx].selectedTile.inHand = false;
+            this.players[idx].selectedTile = null;
+            return;
+          }
+        }
+
+        // Check if the player is overlapping a board tile
+        var overlap = this.players[idx].selectedTile.overlapsTile(this.board);
+        if (overlap != null) {
+          let meld = new Meld(overlap);
+          if (meld.isValid(this.players[idx].selectedTile)) {
+            meld.addTile(this.players[idx].selectedTile);
+            this.melds.push(meld);
+            this.players[idx].playTile(this.players[idx].selectedTile);
+            this.players[idx].selectedTile.inHand = false;
+          }
+        } else {
+          this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
+          this.players[idx].selectedTile.inHand = false;
+        }
+
+      }
       //if a tile was moved from the board to an invalid position
       else if(this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
           && !this.players[idx].selectedTile.inHand){

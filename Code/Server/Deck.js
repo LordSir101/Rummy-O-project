@@ -16,24 +16,26 @@ class Card {
     this.y = ey - (ey % (this.height + 10));
   }
 
-  inIllegalPosition(board, h){
-    //check if it is placed in the hand area
-    if(this.y >= h){
-      return true;
-    }
-    //check if it overlaps another tile
+  // returns the tile which is being overlapped
+  overlapsTile (board) {
     for(var i = 0; i < board.length; i ++) {
       //dont ckeck tile against itself
       if(board[i] == this){
         continue;
       }
       if(this.x == board[i].x && this.y == board[i].y){
-      return true;
+      return board[i];
       }
     }
+    return null;
+  }
 
+  inIllegalPosition(board, h){
+    //check if it is placed in the hand area
+    if(this.y >= h){
+      return true;
+    }
     return false;
-
   }
 }
 

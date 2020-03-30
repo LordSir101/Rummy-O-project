@@ -12,6 +12,7 @@ background.src = "images/background.jpg";
 //game pieces
 var board = [];
 var hand = [];
+var melds = [];
 
 
 //setup-----------------------------------------------------------------------------------------------------
@@ -36,9 +37,10 @@ socket.on("startAnimation", ()=>{
   animationLoop();
 });
 //recieves the cards in the player's hand as well as the board
-socket.on('tilePos', (playerHand, gameBoard)=>{
+socket.on('tilePos', (playerHand, gameBoard, gameMelds)=>{
   hand = playerHand;
   board = gameBoard;
+  melds = gameMelds;
 });
 /*
 function getCookie(cname) {
@@ -76,6 +78,7 @@ function animationLoop() {
   drawBackground();
   drawHand();
   drawBoard();
+  drawMelds();
   animation = requestAnimationFrame(animationLoop);
 }
 
@@ -117,10 +120,21 @@ function drawBoard(){
 
 }
 
+function drawMelds() {
+  for (i = 0; i < melds.length; i++) {
+    for (let j = 0; j < melds[i].tiles.length; j++) {
+      ctx.fillStyle = "#ffe6cc";
+      let tile = melds[i].tiles[j];
+      ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
+      drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
+    }
+  }
+}
+
 //draw the values and color of the cards
 function drawNumber(x, y, width, height, suit, value){
   ctx.fillStyle = suit;
-  ctx.font = "30px Verdana"
+  ctx.font = "30px Verdana";
   ctx.textAlign = 'left'; //bases the poition of the text from the top left corner
   ctx.textBaseline = 'top';
   ctx.lineWidth = 2;
