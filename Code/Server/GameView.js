@@ -9,7 +9,6 @@ class GameView {
     this.w;
     this.h;
     this.setup = false;
-
     this.deck = new Deck();
     this.board = [];
     this.melds = [];
@@ -35,6 +34,9 @@ class GameView {
       sock.on('mouseup', (ex, ey, wo) => {
         this.__mouseup(idx, ex, ey, wo);
       });
+      sock.on('endTurn', () => {
+        this.__endTurn(idx);
+      });
       sock.on('sortValue', () => {
         this.players[idx].sortHandByValue();
       });
@@ -42,6 +44,7 @@ class GameView {
         this.players[idx].sortHandByColor();
 
       });
+
     });
 
 
@@ -73,12 +76,11 @@ class GameView {
   __setUp(w, h){
     this.deck.createDeck();
     this.deck.shuffle();
-
+    this.players[0].isTurn = true;
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());
       }
-
     });
     this.w = w;
     this.h = h;
@@ -227,8 +229,7 @@ class GameView {
 
       // Check if card is in illegal position
       var topOfHand = this.h - player.selectedTile.height*2.2 - 90;
-      if(player.selectedTile.inIllegalPosition(this.board, topOfHand)
-          && !player.selectedTile.inHand){
+      if(player.selectedTile.inIllegalPosition(this.board, topOfHand)){
 
           //move the tile to its origional position
           player.selectedTile.x = player.selectedTile.prevX;
@@ -283,17 +284,42 @@ class GameView {
             player.selectedTile.inHand = false;
           }
         }
-      } else {
-        if(player.selectedTile.inHand){
+      } else if (player.selectedTile.inHand){
           this.board.push(player.playTile(player.selectedTile));
           player.selectedTile.inHand = false;
         }
-      }
       player.selectedTile = null;
 
       //player.playTile(player.selectedTile);
-
     }
+  }
+
+  __endTurn (idx) {
+    let player = this.players[idx];
+    if (player.isTurn == false) {
+      console.log("NOT TURN FOR PLAYER: " + idx);
+      return;
+    }
+    let canEndTurn = true;
+    let maxValue = 0;
+    for (let i = 0; i < this.melds.length; i++) {
+      if (this.melds[i].value > maxValue) {
+        maxValue = this.melds[i].value;
+      }
+      if (!this.melds[i].isValid) {
+        canEndTurn = false;
+      }
+    }
+    if (player.isFirstTurn && maxValue < 20) {
+      canEndTurn = false;
+    }
+    if (!canEndTurn) {
+      player.addTile(this.deck.deal());
+    }
+    console.log("ENDING TURN FOR PLAYER: " + idx);
+    player.isTurn = false;
+    let nextIdx = (idx + 1) % this.players.length;
+    this.players[nextIdx].isTurn = true;
   }
 
 
