@@ -3,7 +3,8 @@ class Player {
   constructor(){
     this.hand = [];
     this.score = 0;
-
+    this.isFirstTurn = true;
+    this.isTurn = false;
     //for drag events
     this.selectedTile = null;
     this.selectedIdx;

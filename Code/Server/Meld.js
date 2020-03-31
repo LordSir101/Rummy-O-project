@@ -3,7 +3,7 @@ class Meld {
   constructor (firstTile) {
     this.tiles = [];
     this.tiles.push(firstTile);
-    this.value = 0;
+    this.value = firstTile.value;
     this.x = firstTile.x;
     this.y = firstTile.y;
     this.width = 52;
@@ -32,7 +32,7 @@ class Meld {
       this.tiles.push(tile);
       this.width += (tile.width + 2);
     }
-
+    this.value += tile.value;
     board.push(tile); //push to board so it is drawn when being dragged
     this.drawMeld();
   }
@@ -59,6 +59,7 @@ class Meld {
         this.x = this.tiles[1].x;
         this.y = this.tiles[1].y;
       }
+      this.value -= tile.value;
       this.tiles.splice(idx, 1);
       this.width -= (tile.width + 2);
       this.drawMeld();
