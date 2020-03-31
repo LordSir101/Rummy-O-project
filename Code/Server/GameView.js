@@ -135,26 +135,26 @@ class GameView {
 
   //click event handlers------------------------------------------------------------------------------------
   __mousedown(idx, ex, ey, wo){
-
+    let player = this.players[idx]
     //wo is the window offset
-    for(var i = 0; i < this.players[idx].hand.length; i++){
+    for(var i = 0; i < player.hand.length; i++){
       //check if the click event is on a tile in the players hand
       //we need to subtract the window offset to make the card's hitbox line up with where the
       //card is being drawn
-      if(ex > this.players[idx].hand[i].x && ex < this.players[idx].hand[i].x + this.players[idx].hand[i].width
-        && ey > this.players[idx].hand[i].y - wo && ey < this.players[idx].hand[i].y - wo + this.players[idx].hand[i].height){
+      if(ex > player.hand[i].x && ex < player.hand[i].x + player.hand[i].width
+        && ey > player.hand[i].y - wo && ey < player.hand[i].y - wo + player.hand[i].height){
 
           //selected tile is a pointer to a tile that the player has selected.
           //this lets us use that tile in other event handlers
-          this.players[idx].selectedTile = this.players[idx].hand[i];
+          player.selectedTile = player.hand[i];
 
           //we set inital x and y so that the card can move relative to where the user clicked
           //If the user clicks in the middle of a card, the middle of the card follows the cursor
           //If the user clicks near the left of the card, the left follows the cursor
-          this.players[idx].initialX = ex - this.players[idx].hand[i].x;
-          this.players[idx].initialY = ey - this.players[idx].hand[i].y;
+          player.initialX = ex - player.hand[i].x;
+          player.initialY = ey - player.hand[i].y;
 
-          this.players[idx].dragActive = true;
+          player.dragActive = true;
         }
     }
 
@@ -164,15 +164,15 @@ class GameView {
       if(ex > this.board[i].x && ex < this.board[i].x + this.board[i].width
         && ey > this.board[i].y -wo && ey < this.board[i].y - wo + this.board[i].height){
 
-          this.players[idx].selectedTile = this.board[i];
+          player.selectedTile = this.board[i];
           //when moving a tile on the board, keep track of its initial position
-          this.players[idx].selectedTile.prevX = this.players[idx].selectedTile.x;
-          this.players[idx].selectedTile.prevY = this.players[idx].selectedTile.y;
+          player.selectedTile.prevX = player.selectedTile.x;
+          player.selectedTile.prevY = player.selectedTile.y;
 
-          this.players[idx].initialX = ex - this.board[i].x;
-          this.players[idx].initialY = ey - this.board[i].y;
+          player.initialX = ex - this.board[i].x;
+          player.initialY = ey - this.board[i].y;
 
-          this.players[idx].dragActive = true;
+          player.dragActive = true;
         }
     }
 
@@ -183,21 +183,21 @@ class GameView {
           && ey > this.melds[i].tiles[j].y -wo && ey < this.melds[i].tiles[j].y - wo + this.melds[i].tiles[j].height){
 
             //remove tile from meld
-            this.players[idx].selectedTile = this.melds[i].removeTile(this.melds[i].tiles[j]);
+            player.selectedTile = this.melds[i].removeTile(this.melds[i].tiles[j]);
 
-            //if(this.players[idx].selectedTile != null){
-              //this.players[idx].selectedTile.inMeld = true;
+            //if(player.selectedTile != null){
+              //player.selectedTile.inMeld = true;
               //when moving a tile on the board, keep track of its initial position
-            this.players[idx].selectedTile.prevX = this.players[idx].selectedTile.x;
-            this.players[idx].selectedTile.prevY = this.players[idx].selectedTile.y;
+            player.selectedTile.prevX = player.selectedTile.x;
+            player.selectedTile.prevY = player.selectedTile.y;
 
-            this.players[idx].initialX = ex - this.players[idx].selectedTile.x;
-            this.players[idx].initialY = ey - this.players[idx].selectedTile.y;
+            player.initialX = ex - player.selectedTile.x;
+            player.initialY = ey - player.selectedTile.y;
 
-            //this.board.push(this.players[idx].selectedTile);
+            //this.board.push(player.selectedTile);
               //this.melds[i].drawMeld();
 
-            this.players[idx].dragActive = true;
+            player.dragActive = true;
             //}
 
           }
@@ -208,91 +208,91 @@ class GameView {
 
   //The card sprite will follow the cursor based on the initial click
   __mousemove(idx, ex, ey){
-    if(this.players[idx].dragActive){
-      this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
-      this.players[idx].selectedTile.y = ey - this.players[idx].initialY;
+    let player = this.players[idx];
+    if(player.dragActive){
+      player.selectedTile.x = ex - player.initialX;
+      player.selectedTile.y = ey - player.initialY;
     }
   }
 
   __mouseup(idx, ex, ey, wo){
-    if(this.players[idx].dragActive){
+    let player = this.players[idx];
+    if(player.dragActive){
       //set the position of the card
-      this.players[idx].selectedTile.x = ex - this.players[idx].initialX;
-      this.players[idx].selectedTile.y = ey - this.players[idx].initialY; //+ wo;
+      player.selectedTile.x = ex - player.initialX;
+      player.selectedTile.y = ey - player.initialY; //+ wo;
 
-      this.players[idx].dragActive = false;
-      this.players[idx].selectedTile.snapOn(ex, ey + wo);
+      player.dragActive = false;
+      player.selectedTile.snapOn(ex, ey + wo);
 
-
-      //if a tile is played from hand and not in an invalid position
-      var topOfHand = this.h - this.players[idx].selectedTile.height*2.2 - 90;
-      if(!this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)){
-        //if the player moved a tile from their hand, remove it and add it to the board
-        //This makes the tile visible to all players
-
-        // Check if the player is overlapping a meld
-        for (let i = 0; i < this.melds.length; i++) {
-          //if overlap and valid
-          if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(this.players[idx].selectedTile)) {
-            this.melds[i].addTile(this.players[idx].selectedTile, this.board);
-            this.players[idx].selectedTile.inMeld = true;
-            this.players[idx].playTile(this.players[idx].selectedTile);
-
-            if(this.players[idx].selectedTile.inHand){
-              this.players[idx].selectedTile.inHand = false;
-            }
-            this.players[idx].selectedTile = null;
-            return;
-          }
-          //if overlap and not valid
-          if (this.melds[i].onMeld(ex, ey + wo) && !this.melds[i].isValid(this.players[idx].selectedTile)) {
-
-            if(!this.players[idx].selectedTile.inHand){
-              this.players[idx].selectedTile.x = this.players[idx].selectedTile.prevX;
-              this.players[idx].selectedTile.y = this.players[idx].selectedTile.prevY;
-            }
-
-            this.players[idx].selectedTile = null;
-            //we return here because all meld tiles are now board tiles as well
-            return;
-          }
-
-        }
-
-        // Check if the player is overlapping a board tile
-        var overlap = this.players[idx].selectedTile.overlapsTile(this.board);
-        if (overlap != null) {
-
-          //overlap becomes the first tile in the meld
-          let meld = new Meld(overlap);
-          if (meld.isValid(this.players[idx].selectedTile)) {
-            meld.addTile(this.players[idx].selectedTile, this.board);
-            this.players[idx].selectedTile.inMeld = true;
-            this.melds.push(meld);
-            if(this.players[idx].selectedTile.inHand){
-              this.players[idx].playTile(this.players[idx].selectedTile);
-              this.players[idx].selectedTile.inHand = false;
-            }
-          }
-        } else {
-          if(this.players[idx].selectedTile.inHand){
-            this.board.push(this.players[idx].playTile(this.players[idx].selectedTile));
-            this.players[idx].selectedTile.inHand = false;
-          }
-        }
-
-      }
-      //if a tile was moved from the board to an invalid position
-      else if(this.players[idx].selectedTile.inIllegalPosition(this.board, topOfHand)
-          && !this.players[idx].selectedTile.inHand){
+      // Check if card is in illegal position
+      var topOfHand = this.h - player.selectedTile.height*2.2 - 90;
+      if(player.selectedTile.inIllegalPosition(this.board, topOfHand)
+          && !player.selectedTile.inHand){
 
           //move the tile to its origional position
-          this.players[idx].selectedTile.x = this.players[idx].selectedTile.prevX;
-          this.players[idx].selectedTile.y = this.players[idx].selectedTile.prevY;
+          player.selectedTile.x = player.selectedTile.prevX;
+          player.selectedTile.y = player.selectedTile.prevY;
+          player.selectedTile = null;
+          return;
       }
 
-      //this.players[idx].playTile(this.players[idx].selectedTile);
-      this.players[idx].selectedTile = null;
+      //if the player moved a tile from their hand, remove it and add it to the board
+      //This makes the tile visible to all players
+
+      // Check if the player is overlapping a meld
+      for (let i = 0; i < this.melds.length; i++) {
+        //if overlap and valid
+        if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(player.selectedTile)) {
+          this.melds[i].addTile(player.selectedTile, this.board);
+          player.selectedTile.inMeld = true;
+          player.playTile(player.selectedTile);
+
+          if(player.selectedTile.inHand){
+            player.selectedTile.inHand = false;
+          }
+          player.selectedTile = null;
+          return;
+        }
+        //if overlap and not valid
+        if (this.melds[i].onMeld(ex, ey + wo) && !this.melds[i].isValid(player.selectedTile)) {
+
+          if(!player.selectedTile.inHand){
+            player.selectedTile.x = player.selectedTile.prevX;
+            player.selectedTile.y = player.selectedTile.prevY;
+          }
+
+          player.selectedTile = null;
+          //we return here because all meld tiles are now board tiles as well
+          return;
+        }
+
+      }
+
+      // Check if the player is overlapping a board tile
+      var overlap = player.selectedTile.overlapsTile(this.board);
+      if (overlap != null) {
+        //overlap becomes the first tile in the meld
+        let meld = new Meld(overlap);
+        if (meld.isValid(player.selectedTile)) {
+          meld.addTile(player.selectedTile, this.board);
+          player.selectedTile.inMeld = true;
+          this.melds.push(meld);
+          if(player.selectedTile.inHand){
+            player.playTile(player.selectedTile);
+            player.selectedTile.inHand = false;
+          }
+        }
+      } else {
+        if(player.selectedTile.inHand){
+          this.board.push(player.playTile(player.selectedTile));
+          player.selectedTile.inHand = false;
+        }
+      }
+      player.selectedTile = null;
+
+      //player.playTile(player.selectedTile);
+
     }
   }
 
