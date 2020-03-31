@@ -12,14 +12,23 @@ class Meld {
   addTile (tile, board) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
-    if (tile.suit == last.suit && tile.value == last.value + 1) {
+
+    // Condition 1 for a run
+    if (tile.suit == last.suit && tile.value == last.value + 1
+      && tile.suit == first.suit) {
       this.tiles.push(tile);
       this.width += (tile.width + 2);
-    } else if (tile.suit == first.suit && tile.value == first.value - 1) {
+
+      // Condition 2 for a run
+    } else if (tile.suit == first.suit && tile.value == first.value - 1
+      && tile.suit == last.suit) {
       this.tiles.unshift(tile);
       this.x -= tile.width;
       this.width += (tile.width + 2);
-    } else if (tile.value == first.value && tile.value == last.value) {
+
+      // Condition for a ?match?
+    } else if (tile.value == first.value && tile.value == last.value
+      && tile.suit != last.suit) {
       this.tiles.push(tile);
       this.width += (tile.width + 2);
     }
@@ -46,7 +55,7 @@ class Meld {
     }
     else{*/
     var idx = this.tiles.indexOf(tile);
-      if(idx == 0){
+      if(idx == 0 && this.tiles[1] != null){
         this.x = this.tiles[1].x;
         this.y = this.tiles[1].y;
       }
@@ -127,8 +136,6 @@ class Meld {
 
   // return true if mouse is within its bounds
   onMeld (ex, ey) {
-    console.log("ex " + ex);
-    console.log("ey " + ey);
     if ((ex < this.x + this.width && ex > this.x)
       && (ey < this.y + this.tiles[0].height && ey > this.y)) {
         return true;
