@@ -71,9 +71,9 @@ class Meld {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
 
-    if ((tile.suit == last.suit && tile.value == last.value + 1)
-       || (tile.suit == first.suit && tile.value == first.value - 1)
-       || (tile.value == first.value && tile.value == last.value)) {
+    if ((tile.suit == last.suit && tile.value == last.value + 1 && tile.suit == first.suit)
+       || (tile.suit == first.suit && tile.value == first.value - 1 && tile.suit == last.suit)
+       || (tile.value == first.value && tile.value == last.value && tile.suit != last.suit)) {
       return true
     }
     return false;
