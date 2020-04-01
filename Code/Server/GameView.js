@@ -352,14 +352,15 @@ class GameView {
       canEndTurn = true;
 
     }
-    else if(!player.isFirstTurn && score > 0){
+    else if(!player.isFirstTurn && maxValue > 0){
       canEndTurn = true;
     }
     if (!canEndTurn) {
       player.addTile(this.deck.deal());
 
       //if maxValue was not enough, return the melds to player's hand
-      for (let i = 0; i < this.melds.length; i++) {
+      let length = this.melds.length;
+      for (let i = length -1; i >= 0; i--) {
         //let valid = this.melds[i].checkIfMeldValid();
         //only check points of melds that were modified this turn
         if(this.melds[i].createdThisTurn){
