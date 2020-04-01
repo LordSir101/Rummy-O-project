@@ -92,7 +92,9 @@ class GameView {
     this.sockets.forEach((sock, i) => {
       //send the players' hand and game board positions
       sock.emit("tilePos", this.players[i].hand, this.board, this.melds);
+      sock.emit("playerInfo", this.players[i].isTurn);
     });
+
 
     //we want to constantly update the position of the cards in hand to respond to any changes
     this.__setHandPos();
@@ -184,23 +186,26 @@ class GameView {
         if(ex > this.melds[i].tiles[j].x && ex < this.melds[i].tiles[j].x + this.melds[i].tiles[j].width
           && ey > this.melds[i].tiles[j].y -wo && ey < this.melds[i].tiles[j].y - wo + this.melds[i].tiles[j].height){
 
-            //remove tile from meld
+            //remove tile from meld if not in the middle
             player.selectedTile = this.melds[i].removeTile(this.melds[i].tiles[j]);
 
-            //if(player.selectedTile != null){
+            if(player.selectedTile != null){
               //player.selectedTile.inMeld = true;
               //when moving a tile on the board, keep track of its initial position
-            player.selectedTile.prevX = player.selectedTile.x;
-            player.selectedTile.prevY = player.selectedTile.y;
+              player.selectedTile.prevX = player.selectedTile.x;
+              player.selectedTile.prevY = player.selectedTile.y;
 
-            player.initialX = ex - player.selectedTile.x;
-            player.initialY = ey - player.selectedTile.y;
+              player.initialX = ex - player.selectedTile.x;
+              player.initialY = ey - player.selectedTile.y;
 
             //this.board.push(player.selectedTile);
               //this.melds[i].drawMeld();
 
-            player.dragActive = true;
-            //}
+              player.dragActive = true;
+            }
+            else{
+              player.dragActive = false;
+            }
 
           }
       }
@@ -284,7 +289,14 @@ class GameView {
             player.selectedTile.inHand = false;
           }
         }
-      } else if (player.selectedTile.inHand){
+        //if there is an overlap but the meld is not is not valid
+        else{
+          overlap.inMeld = false;
+          player.selectedTile.x = player.selectedTile.prevX;
+          player.selectedTile.y = player.selectedTile.prevY;
+        }
+      }
+      else if (player.selectedTile.inHand){
           this.board.push(player.playTile(player.selectedTile));
           player.selectedTile.inHand = false;
         }
@@ -300,30 +312,96 @@ class GameView {
       console.log("NOT TURN FOR PLAYER: " + idx);
       return;
     }
-    let canEndTurn = true;
+    let canEndTurn = false;
     let maxValue = 0;
+
+    //check if all melds are valid
     for (let i = 0; i < this.melds.length; i++) {
-      if (this.melds[i].value > maxValue) {
-        maxValue = this.melds[i].value;
+      let valid = this.melds[i].checkIfMeldValid();
+      //only check points of melds that were modified this turn
+      if(this.melds[i].createdThisTurn && valid){
+        maxValue += this.melds[i].value;
       }
-      if (!this.melds[i].isValid) {
-        canEndTurn = false;
+
+      //not valid and created this turn
+      if (!valid && this.melds[i].createdThisTurn) {
+        let midx = this.melds.indexOf(this.melds[i])
+        this.__returnMeldToHand(midx, idx);
+      }
+      //not valid and not created this turn
+      else if (!this.melds[i].createdThisTurn && !valid){
+        console.log("fix meld");
+        //the player needs to fix the meld if it was another player's
+        return;
+      }
+
+    }
+
+    //check if any tiles are unmelded
+    for (var i = 0; i < this.board.length; i++) {
+      if(!this.board[i].inMeld){
+        //return any single tiles to the player's hand
+        this.players[idx].addTile(this.board[i]);
+        this.board[i].inHand = true;
+        this.board.splice(i, 1);
+
       }
     }
-    if (player.isFirstTurn && maxValue < 20) {
-      canEndTurn = false;
+
+    if (player.isFirstTurn && maxValue > 20) {
+      canEndTurn = true;
+
+    }
+    else if(!player.isFirstTurn && score > 0){
+      canEndTurn = true;
     }
     if (!canEndTurn) {
       player.addTile(this.deck.deal());
+
+      //if maxValue was not enough, return the melds to player's hand
+      for (let i = 0; i < this.melds.length; i++) {
+        //let valid = this.melds[i].checkIfMeldValid();
+        //only check points of melds that were modified this turn
+        if(this.melds[i].createdThisTurn){
+          let midx = this.melds.indexOf(this.melds[i]);
+          this.__returnMeldToHand(midx, idx)
+        }
+      }
+
     }
     console.log("ENDING TURN FOR PLAYER: " + idx);
     player.isTurn = false;
     let nextIdx = (idx + 1) % this.players.length;
     this.players[nextIdx].isTurn = true;
+
+    for (let i = 0; i < this.melds.length; i++) {
+      if(this.melds[i].createdThisTurn){
+        this.melds[i].createdThisTurn = false;
+      }
+    }
+
+  }
+
+  __returnMeldToHand(midx, idx){
+    console.log("midx "+ midx);
+    let length = this.melds[midx].tiles.length;
+    for (let j = length -1; j >= 0; j--) {
+        console.log(this.melds[midx].tiles[j]);
+        let bidx = this.board.indexOf(this.melds[midx].tiles[j]);
+        this.players[idx].addTile(this.melds[midx].tiles[j]);
+        this.melds[midx].tiles[j].inHand = true;
+        this.board.splice(bidx, 1);
+        this.melds[midx].removeTile(this.melds[midx].tiles[j]);
+        //canEndTurn = false;
+
+    }
+    let idx2 = this.melds.indexOf(this.melds[midx]);
+    this.melds.splice(idx2, 1);
   }
 
 
-
 }
+
+
 
 module.exports = GameView;
