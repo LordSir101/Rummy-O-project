@@ -13,6 +13,8 @@ background.src = "images/background.jpg";
 var board = [];
 var hand = [];
 var melds = [];
+var isTurn = false;
+
 
 
 //setup-----------------------------------------------------------------------------------------------------
@@ -41,6 +43,9 @@ socket.on('tilePos', (playerHand, gameBoard, gameMelds)=>{
   hand = playerHand;
   board = gameBoard;
   melds = gameMelds;
+});
+socket.on('playerInfo', (turn)=>{
+  isTurn = turn;
 });
 /*
 function getCookie(cname) {
@@ -111,6 +116,13 @@ function drawHand(){
   for(i = 0; i < hand.length; i++){
     var tile = hand[i];
     ctx.fillStyle = "#ffe6cc";
+    if(isTurn){
+      ctx.strokeStyle = "blue";
+    }
+    else{
+      ctx.strokeStyle = "red";
+    }
+    ctx.strokeRect(tile.x, tile.y, tile.width, tile.height);
     ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
 
     drawNumber(tile.x, tile.y, tile.width, tile.height, tile.suit, tile.value);
@@ -162,16 +174,19 @@ function drawNumber(x, y, width, height, suit, value){
 //Drag tiles around---------------------------------------------------------------------------------
 const canWrap = document.getElementById("canvasWrap");
 canWrap.addEventListener('mousedown', (e)=>{
-    //offeset is the amount of pixels the user scrolled down.
-    //scrolling down changes where the cards are drawn, but not thier hitboxes
-    var offset = window.pageYOffset;
-    console.log(e.clientY)
-    socket.emit("mousedown", e.clientX, e.clientY, offset);
+  if(!isTurn){return;}
+  //offeset is the amount of pixels the user scrolled down.
+  //scrolling down changes where the cards are drawn, but not thier hitboxes
+  var offset = window.pageYOffset;
+  console.log(e.clientY)
+  socket.emit("mousedown", e.clientX, e.clientY, offset);
 });
 canWrap.addEventListener('mousemove', (e)=>{
+  if(!isTurn){return;}
   socket.emit("mousemove", e.clientX, e.clientY);
 });
 canWrap.addEventListener('mouseup', (e)=>{
+  if(!isTurn){return;}
   var offset = window.pageYOffset;
   socket.emit("mouseup", e.clientX, e.clientY, offset);
 });

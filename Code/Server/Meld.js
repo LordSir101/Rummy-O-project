@@ -3,10 +3,12 @@ class Meld {
   constructor (firstTile) {
     this.tiles = [];
     this.tiles.push(firstTile);
+    firstTile.inMeld = true;
     this.value = firstTile.value;
     this.x = firstTile.x;
     this.y = firstTile.y;
     this.width = 52;
+    this.createdThisTurn = true;
   }
 
   addTile (tile, board) {
@@ -33,6 +35,8 @@ class Meld {
       this.width += (tile.width + 2);
     }
     this.value += tile.value;
+    tile.inMeld = true;
+    this.createdThisTurn = true;
     board.push(tile); //push to board so it is drawn when being dragged
     this.drawMeld();
   }
@@ -44,10 +48,10 @@ class Meld {
   }
 
   removeTile(tile){
-    /*
+
     if(tile != this.tiles[0] && tile != this.tiles[this.tiles.length - 1]){
       return null;
-    }*/
+    }
     /*
 
     if(!this.checkIfMeldValid(idx)){
@@ -62,6 +66,7 @@ class Meld {
       this.value -= tile.value;
       this.tiles.splice(idx, 1);
       this.width -= (tile.width + 2);
+      tile.inMeld = false;
       this.drawMeld();
     //}
 
@@ -80,7 +85,7 @@ class Meld {
     return false;
   }
 
-  checkIfMeldValid(idx){
+  checkIfMeldValid(){
     /*
     var test = [];
     this.tiles.forEach((tile) => {
@@ -93,6 +98,9 @@ class Meld {
     this.tiles.forEach((tile) => {
       test.push(tile);
     });
+    if(test.length == 0){
+      return;
+    }
     var median;
     var mean;
     var value = 0;
@@ -125,11 +133,17 @@ class Meld {
     }
 
     //a set of consecutive numbers will have the same mean and median
+    console.log(mean);
+    console.log(median);
+    console.log(sameSuit);
+    console.log(test.length);
     if(mean == median && sameSuit && test.length >= 3){
+      console.log("valid")
       return true;
     }
     //check for a three of a kind of different suit
     else if(!sameSuit && sameVal && test.length >= 3){
+      console.log("valid")
       return true;
     }
     return false;
