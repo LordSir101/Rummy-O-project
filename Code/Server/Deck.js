@@ -74,6 +74,11 @@ class Deck {
     return give;*/
   }
 
+  //testing
+  dealJoker () {
+    return new Card ('red', 'J');
+  }
+
   shuffle() {
 
     let c = this.deck.length, t, i;
