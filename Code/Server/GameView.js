@@ -318,10 +318,15 @@ class GameView {
           player.selectedTile.y = player.selectedTile.prevY;
         }
       }
+      //Tile is played by itself
       else if (player.selectedTile.inHand){
+        //console.log(player.selectedTile.value);
+        if(player.selectedTile.value != "J"){
           this.board.push(player.playTile(player.selectedTile));
           player.selectedTile.inHand = false;
         }
+
+      }
       player.selectedTile = null;
 
       //player.playTile(player.selectedTile);
@@ -358,7 +363,7 @@ class GameView {
       }
 
     }
-    
+
     //check if any tiles are unmelded
     for (var i = this.board.length -1; i >= 0 ; i--) {
       if(!this.board[i].inMeld){
