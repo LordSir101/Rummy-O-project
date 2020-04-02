@@ -11,10 +11,41 @@ class Meld {
     this.createdThisTurn = true;
   }
 
-  addTile (tile, board) {
+  addTile (tile, board, ex) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
 
+    // Check if a joker is being added
+    if (tile.value == 'J') {
+
+      // Check if meld is a value match
+      let temp = true;
+      let s = ['red', 'black', 'yellow', 'blue'];
+      if (this.tiles.length > 1) {
+        temp = this.tiles[0].suit == this.tiles[1].suit ? false : true;
+      }
+      if (temp && ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3) {
+        for (let i = 0; i < this.tiles.length; i++) {
+          for (let j = 0; j < s.length; j++) {
+            if (s[j] == this.tiles[i].suit) {
+              s.splice(j, 1);
+            }
+          }
+        }
+        tile.suit = s[0];
+        tile.value = this.tiles[0].value;
+        // Check if mouse is in the left half
+      } else if (ex < this.x + this.width / 3) {
+        tile.value = this.tiles[0].value - 1;
+        tile.suit = this.tiles[0].suit;
+
+      // Check if mouse is in the right half
+    } else if (ex > this.x + 2 * this.width / 3) {
+        tile.value = this.tiles[this.tiles.length - 1].value + 1;
+        tile.suit = this.tiles[this.tiles.length - 1].suit;
+
+      }
+    }
     // Condition 1 for a run
     if (tile.suit == last.suit && tile.value == last.value + 1
       && tile.suit == first.suit) {
@@ -82,10 +113,28 @@ class Meld {
     return tile;
   }
 
-  isValid (tile) {
+  isValid (tile, ex) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
 
+    if (tile.value == 'J' && this.tiles.length == 1) {
+      if ((ex > this.x && ex < this.x + this.width / 3 && this.tiles[0].value > 1)
+      || (ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3)
+      || (ex > this.x + 2 * this.width / 3 && this.tiles[0].value < 13)) {
+        return true;
+      }
+      return false;
+    }
+    else if (this.tiles.length > 1) {
+      if (this.tiles[0].value == this.tiles[1].value && this.tiles.length < 4) {
+        return true;
+      }
+      if ((ex < this.x + this.width / 3 && this.tiles[0].value > 1)
+        || (ex > this.x + 2 * this.width / 3 && this.tiles[this.tiles.length - 1].value < 13)) {
+        return true
+      }
+      return false;
+    }
 
     if ((tile.suit == last.suit && tile.value == last.value + 1 && tile.suit == first.suit)
        || (tile.suit == first.suit && tile.value == first.value - 1 && tile.suit == last.suit)) {

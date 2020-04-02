@@ -77,6 +77,7 @@ class GameView {
     this.deck.createDeck();
     this.deck.shuffle();
     this.players[0].isTurn = true;
+    this.players[0].addTile(this.deck.dealJoker());
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());
@@ -249,8 +250,8 @@ class GameView {
       // Check if the player is overlapping a meld
       for (let i = 0; i < this.melds.length; i++) {
         //if overlap and valid
-        if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(player.selectedTile)) {
-          this.melds[i].addTile(player.selectedTile, this.board);
+        if (this.melds[i].onMeld(ex, ey + wo) && this.melds[i].isValid(player.selectedTile, ex)) {
+          this.melds[i].addTile(player.selectedTile, this.board, ex);
           player.selectedTile.inMeld = true;
           player.playTile(player.selectedTile);
 
@@ -261,7 +262,7 @@ class GameView {
           return;
         }
         //if overlap and not valid
-        if (this.melds[i].onMeld(ex, ey + wo) && !this.melds[i].isValid(player.selectedTile)) {
+        if (this.melds[i].onMeld(ex, ey + wo) && !this.melds[i].isValid(player.selectedTile, ex)) {
 
           if(!player.selectedTile.inHand){
             player.selectedTile.x = player.selectedTile.prevX;
@@ -280,8 +281,8 @@ class GameView {
       if (overlap != null) {
         //overlap becomes the first tile in the meld
         let meld = new Meld(overlap);
-        if (meld.isValid(player.selectedTile)) {
-          meld.addTile(player.selectedTile, this.board);
+        if (meld.isValid(player.selectedTile, ex)) {
+          meld.addTile(player.selectedTile, this.board, ex);
           player.selectedTile.inMeld = true;
           this.melds.push(meld);
           if(player.selectedTile.inHand){
