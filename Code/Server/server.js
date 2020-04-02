@@ -39,8 +39,8 @@ io.on('connection', (sock) => {
 
     //If there are 4 waiting players, start the game
     if(waitingPlayers.length == 4){
-      var game = new GameView(waitingPlayers);
-      //var gameId = Math.floor(Math.random * (999999 - 000000) + 000000);
+      var gameId = games.size; //this will be the index of the game
+      var game = new GameView(waitingPlayers, gameId);
       games.push(game);
       /*
       var gameId = games.indexOf(game);
@@ -48,10 +48,33 @@ io.on('connection', (sock) => {
       games.forEach((sock) => {
         sock.emit("gameId", gameId);
       });*/
+      console.log("players " + players.length);
+      console.log("games " + games.length);
       waitingPlayers = [];
     }
   });
+
+  sock.on('disconnect', (sock)=>{
+    let idx = players.indexOf(sock);
+    players.splice(idx, 1);
+    //console.log("players " + players.length)
+  });
+
+  sock.on("removeGame", (id)=>{
+
+    for(var i = games.length-1; i >= 0; i--) {
+      if(games[i].gameId == id){
+        let idx = games.indexOf(games[i])
+        games.splice(idx, 1);
+      }
+    }
+  //  console.log("players " + players.length);
+    console.log("games " + games.length);
+  })
 });
+
+
+
   /*
   sock.emit("getCookie");
   sock.on("sendCookie", addToGame);

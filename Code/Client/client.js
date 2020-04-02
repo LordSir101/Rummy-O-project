@@ -74,11 +74,19 @@ function startGame(){
   button.style.display = "none";
 }
 
-socket.on("endGame", (didWin)=>{
+socket.on("endGame", (didWin, id)=>{
   cancelAnimationFrame(animation);
   animation = null;
   displayEndScreen(didWin);
-})
+  //sleep(5000);
+  //socket.emit("disconnect");
+  if(didWin){
+    socket.emit("removeGame", id)
+  }
+
+  button.addEventListener('click', startGame);
+  button.style.display = "block";
+});
 
 
 const endTurn = document.getElementById("endTurn");

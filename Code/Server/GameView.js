@@ -3,7 +3,7 @@ const Deck = require('./Deck');
 const Meld = require('./Meld');
 
 class GameView {
-  constructor(sockets) {
+  constructor(sockets, gameId) {
     this.sockets = sockets;
     this.players = [];
     this.w;
@@ -13,9 +13,12 @@ class GameView {
     this.board = [];
     this.melds = [];
     this.loop;
+    this.id = gameId;
+    this.gameOver = false;
+    //this.gameId = gameId;
     //set an event listener to start animation loop on each client
     this.sockets.forEach((sock, i) => {
-      this.players[i] = new Player();
+      this.players[i] = new Player(gameId);
       sock.emit("startAnimation");
       sock.on("canvasDim", (w, h)=>{
         //this ensures the setup function is only called once
@@ -68,9 +71,14 @@ class GameView {
 
   //main game loop---------------------------------------------------------------------------------------------
   __updateVariables(){
+    //console.log("updateVariables");
       this.__update();
-
-      this.loop = setTimeout(this.__updateVariables.bind(this), 16.6);
+      if(this.gameOver){
+        clearTimeout(this.loop);
+      }
+      else{
+        this.loop = setTimeout(this.__updateVariables.bind(this), 16.6);
+      }
   }
 
   //Game setup------------------------------------------------------------------------------------------------
@@ -92,11 +100,12 @@ class GameView {
   __update(){
 
     //check if a player won
-    this.players.forEach((player) => {
+    this.players.forEach((player, i) => {
       if(player.won){
-        clearTimeout(this.loop);
+        this.gameOver = true;
+        //this.sockets[i].emit("removeGame", this.gameId); //we only want to send this once
         this.sockets.forEach((sock, i) => {
-          sock.emit("endGame", this.players[i].won);
+          sock.emit("endGame", this.players[i].won, this.gameId);
         });
       }
     });
@@ -348,7 +357,7 @@ class GameView {
       }
 
     }
-
+    /*
     //check if any tiles are unmelded
     for (var i = this.board.length -1; i >= 0 ; i--) {
       if(!this.board[i].inMeld){
@@ -358,7 +367,7 @@ class GameView {
         this.board.splice(i, 1);
 
       }
-    }
+    }*/
 
     if (player.isFirstTurn && maxValue > 20) {
       canEndTurn = true;
@@ -367,7 +376,7 @@ class GameView {
     else if(!player.isFirstTurn && maxValue > 0){
       canEndTurn = true;
     }
-
+    canEndTurn = true;
     if (!canEndTurn) {
       player.addTile(this.deck.deal());
 
