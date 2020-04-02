@@ -174,8 +174,9 @@ class Meld {
     this.tiles.forEach((tile) => {
       test.push(tile);
     });
+
     if(test.length == 0){
-      return;
+      return true;
     }
     var median;
     var mean;
@@ -213,6 +214,7 @@ class Meld {
     console.log(median);
     console.log(sameSuit);
     console.log(test.length);
+    //a meld of 0 will be valid but invisible
     if(mean == median && sameSuit && test.length >= 3){
       console.log("valid")
       return true;
