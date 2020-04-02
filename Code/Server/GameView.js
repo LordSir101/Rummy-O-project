@@ -12,6 +12,7 @@ class GameView {
     this.deck = new Deck();
     this.board = [];
     this.melds = [];
+    this.loop;
     //set an event listener to start animation loop on each client
     this.sockets.forEach((sock, i) => {
       this.players[i] = new Player();
@@ -89,6 +90,17 @@ class GameView {
 
   //update game info--------------------------------------------------------------------------------------------
   __update(){
+
+    //check if a player won
+    this.players.forEach((player) => {
+      if(player.won){
+        clearTimeout(this.loop);
+        this.sockets.forEach((sock, i) => {
+          sock.emit("endGame", this.players[i].won);
+        });
+      }
+    });
+
     this.sockets.forEach((sock, i) => {
       //send the players' hand and game board positions
       sock.emit("tilePos", this.players[i].hand, this.board, this.melds);
@@ -338,7 +350,7 @@ class GameView {
     }
 
     //check if any tiles are unmelded
-    for (var i = 0; i < this.board.length; i++) {
+    for (var i = this.board.length -1; i >= 0 ; i--) {
       if(!this.board[i].inMeld){
         //return any single tiles to the player's hand
         this.players[idx].addTile(this.board[i]);
@@ -355,6 +367,7 @@ class GameView {
     else if(!player.isFirstTurn && maxValue > 0){
       canEndTurn = true;
     }
+
     if (!canEndTurn) {
       player.addTile(this.deck.deal());
 
@@ -379,6 +392,9 @@ class GameView {
       if(this.melds[i].createdThisTurn){
         this.melds[i].createdThisTurn = false;
       }
+    }
+    if(player.hand.length == 0){
+      player.won = true;
     }
 
   }
