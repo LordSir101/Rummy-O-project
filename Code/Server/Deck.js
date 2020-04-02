@@ -10,6 +10,7 @@ class Card {
     this.height = 70;
     this.inHand = true;
     this.inMeld = false;
+    this.wasJoker = value == 'J' ? true : false;
   }
 
   snapOn(ex, ey, w) {

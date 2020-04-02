@@ -389,6 +389,9 @@ class GameView {
     let length = this.melds[midx].tiles.length;
     for (let j = length -1; j >= 0; j--) {
         console.log(this.melds[midx].tiles[j]);
+        if (this.melds[midx].tiles[j].wasJoker) {
+          this.melds[midx].tiles[j].value = 'J';
+        }
         let bidx = this.board.indexOf(this.melds[midx].tiles[j]);
         this.players[idx].addTile(this.melds[midx].tiles[j]);
         this.melds[midx].tiles[j].inHand = true;

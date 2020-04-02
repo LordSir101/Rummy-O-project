@@ -35,6 +35,14 @@ class Meld {
         tile.suit = s[0];
         tile.value = this.tiles[0].value;
         // Check if mouse is in the left half
+      } else if (this.tiles.length == 1 && ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3) {
+        for (let k = 0; k < s.length; k++) {
+          if (s[k] != this.tiles[0].suit) {
+            tile.value = this.tiles[0].value;
+            tile.suit = s[k];
+            break;
+          }
+        }
       } else if (ex < this.x + this.width / 3) {
         tile.value = this.tiles[0].value - 1;
         tile.suit = this.tiles[0].suit;
