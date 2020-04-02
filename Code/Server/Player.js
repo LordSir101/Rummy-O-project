@@ -36,7 +36,12 @@ class Player {
 
   sortHandByValue () {
     this.hand.sort((a, b) => {
-      let temp = 4 * (a.value - b.value);
+      let temp;
+      let aX;
+      let bX;
+      aX = a.value == 'J' ? 14 : a.value;
+      bX = b.value == 'J' ? 14 : b.value;
+      temp = 4 * (aX - bX);
       let colors = {"black": 0, "red": 1, "blue": 2, "yellow": 3 };
       temp += (colors[a.suit] - colors[b.suit]);
       return temp;
@@ -46,8 +51,12 @@ class Player {
   sortHandByColor () {
     this.hand.sort((a, b) => {
       let colors = {"black": 0, "red": 1, "blue": 2, "yellow": 3 };
-      let temp = 13 * (colors[a.suit] - colors[b.suit]);
-      temp += (a.value - b.value);
+      let temp = 14 * (colors[a.suit] - colors[b.suit]);
+      let aX;
+      let bX;
+      aX = a.value == 'J' ? 14 : a.value;
+      bX = b.value == 'J' ? 14 : b.value;
+      temp += (aX - bX);
       return temp;
     });
   }

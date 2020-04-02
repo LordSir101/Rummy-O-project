@@ -29,10 +29,19 @@ class Meld {
       this.width += (tile.width + 2);
 
       // Condition for a ?match?
-    } else if (tile.value == first.value && tile.value == last.value
-      && tile.suit != last.suit) {
-      this.tiles.push(tile);
-      this.width += (tile.width + 2);
+    } else if (tile.value == first.value && tile.value == last.value) {
+      let temp = true;
+      for (let i = 0; i < this.tiles.length; i++) {
+        console.log(tile.suit + ", " + this.tiles[i].suit);
+        if (tile.suit == this.tiles[i].suit) {
+          temp = false;
+        }
+      }
+      if (temp = true) {
+        this.tiles.push(tile);
+        this.width += (tile.width + 2);
+      }
+
     }
     this.value += tile.value;
     tile.inMeld = true;
@@ -77,10 +86,20 @@ class Meld {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
 
+
     if ((tile.suit == last.suit && tile.value == last.value + 1 && tile.suit == first.suit)
-       || (tile.suit == first.suit && tile.value == first.value - 1 && tile.suit == last.suit)
-       || (tile.value == first.value && tile.value == last.value && tile.suit != last.suit)) {
-      return true
+       || (tile.suit == first.suit && tile.value == first.value - 1 && tile.suit == last.suit)) {
+      return true;
+    } else if (tile.value == first.value && tile.value == last.value) {
+      var temp = true;
+      for (let i = 0; i < this.tiles.length; i++) {
+        console.log(tile.suit + ", " + this.tiles[i].suit);
+        if (tile.suit == this.tiles[i].suit) {
+          temp = false;
+        }
+      }
+      console.log(temp);
+      return temp;
     }
     return false;
   }
