@@ -344,19 +344,19 @@ class GameView {
 
     //check if all melds are valid
     for (let i = 0; i < this.melds.length; i++) {
-      let valid = this.melds[i].checkIfMeldValid();
+
       //only check points of melds that were modified this turn
-      if(this.melds[i].createdThisTurn && valid){
+      if(this.melds[i].createdThisTurn && this.melds[i].checkIfMeldValid()){
         maxValue += this.melds[i].value;
       }
 
       //not valid and created this turn
-      if (!valid && this.melds[i].createdThisTurn) {
+      if (!this.melds[i].checkIfMeldValid() && this.melds[i].createdThisTurn) {
         let midx = this.melds.indexOf(this.melds[i])
         this.__returnMeldToHand(midx, idx);
       }
       //not valid and not created this turn
-      else if (!this.melds[i].createdThisTurn && !valid){
+      else if (!this.melds[i].createdThisTurn && !this.melds[i].checkIfMeldValid()){
         console.log("fix meld");
         //the player needs to fix the meld if it was another player's
         return;
