@@ -1,6 +1,6 @@
 
 class Player {
-  constructor(){
+  constructor(gameId){
     this.hand = [];
     this.score = 0;
     this.isFirstTurn = true;
