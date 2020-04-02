@@ -357,7 +357,7 @@ class GameView {
       }
 
     }
-    /*
+    
     //check if any tiles are unmelded
     for (var i = this.board.length -1; i >= 0 ; i--) {
       if(!this.board[i].inMeld){
@@ -367,7 +367,7 @@ class GameView {
         this.board.splice(i, 1);
 
       }
-    }*/
+    }
 
     if (player.isFirstTurn && maxValue > 20) {
       canEndTurn = true;
@@ -376,7 +376,7 @@ class GameView {
     else if(!player.isFirstTurn && maxValue > 0){
       canEndTurn = true;
     }
-    canEndTurn = true;
+
     if (!canEndTurn) {
       player.addTile(this.deck.deal());
 
