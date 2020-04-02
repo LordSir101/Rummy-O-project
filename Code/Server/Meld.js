@@ -124,26 +124,26 @@ class Meld {
   isValid (tile, ex) {
     var first = this.tiles[0];
     var last = this.tiles[this.tiles.length - 1];
-
-    if (tile.value == 'J' && this.tiles.length == 1) {
-      if ((ex > this.x && ex < this.x + this.width / 3 && this.tiles[0].value > 1)
-      || (ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3)
-      || (ex > this.x + 2 * this.width / 3 && this.tiles[0].value < 13)) {
-        return true;
+    if (tile.value == 'J') {
+      if (this.tiles.length == 1) {
+        if ((ex > this.x && ex < this.x + this.width / 3 && this.tiles[0].value > 1)
+        || (ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3)
+        || (ex > this.x + 2 * this.width / 3 && this.tiles[0].value < 13)) {
+          return true;
+        }
+        return false;
       }
-      return false;
+      else if (this.tiles.length > 1) {
+        if (this.tiles[0].value == this.tiles[1].value && this.tiles.length < 4) {
+          return true;
+        }
+        if ((ex < this.x + this.width / 3 && this.tiles[0].value > 1)
+          || (ex > this.x + 2 * this.width / 3 && this.tiles[this.tiles.length - 1].value < 13)) {
+          return true
+        }
+        return false;
+      }
     }
-    else if (this.tiles.length > 1) {
-      if (this.tiles[0].value == this.tiles[1].value && this.tiles.length < 4) {
-        return true;
-      }
-      if ((ex < this.x + this.width / 3 && this.tiles[0].value > 1)
-        || (ex > this.x + 2 * this.width / 3 && this.tiles[this.tiles.length - 1].value < 13)) {
-        return true
-      }
-      return false;
-    }
-
     if ((tile.suit == last.suit && tile.value == last.value + 1 && tile.suit == first.suit)
        || (tile.suit == first.suit && tile.value == first.value - 1 && tile.suit == last.suit)) {
       return true;

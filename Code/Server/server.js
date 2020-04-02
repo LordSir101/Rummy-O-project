@@ -38,7 +38,7 @@ io.on('connection', (sock) => {
     waitingPlayers.push(sock);
 
     //If there are 4 waiting players, start the game
-    if(waitingPlayers.length == 4){
+    if(waitingPlayers.length == 2){
       var gameId = games.size; //this will be the index of the game
       var game = new GameView(waitingPlayers, gameId);
       games.push(game);
