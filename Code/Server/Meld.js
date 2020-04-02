@@ -24,7 +24,7 @@ class Meld {
       if (this.tiles.length > 1) {
         temp = this.tiles[0].suit == this.tiles[1].suit ? false : true;
       }
-      if (temp && ex > this.x + this.width / 3 && ex < this.x + 2 * this.width / 3) {
+      if (temp && this.tiles.length > 1) {
         for (let i = 0; i < this.tiles.length; i++) {
           for (let j = 0; j < s.length; j++) {
             if (s[j] == this.tiles[i].suit) {
