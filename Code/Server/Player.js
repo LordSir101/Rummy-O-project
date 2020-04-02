@@ -11,6 +11,7 @@ class Player {
     this.initialX;
     this.initialY;
     this.dragActive = false;
+    this.won = false;
   }
 
   addTile (tile) {

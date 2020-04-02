@@ -66,10 +66,20 @@ function getCookie(cname) {
 
 // Button listener to start the game
 const button = document.getElementById("startButton");
-button.addEventListener('click', () => {
-  console.log("pressed");
+button.addEventListener('click', startGame);
+
+function startGame(){
   socket.emit('startGame');
-});
+  button.removeEventListener('click', startGame);
+  button.style.display = "none";
+}
+
+socket.on("endGame", (didWin)=>{
+  cancelAnimationFrame(animation);
+  animation = null;
+  displayEndScreen(didWin);
+})
+
 
 const endTurn = document.getElementById("endTurn");
 endTurn.addEventListener('click', () => {
@@ -190,3 +200,24 @@ canWrap.addEventListener('mouseup', (e)=>{
   var offset = window.pageYOffset;
   socket.emit("mouseup", e.clientX, e.clientY, offset);
 });
+
+//display the game end screen
+function displayEndScreen(didWin){
+  ctx.drawImage(background, 0,  0, w, h);
+
+  ctx.fillStyle = "white";
+  ctx.font = "50px Verdana";
+  ctx.textAlign = 'left'; //bases the poition of the text from the top left corner
+  ctx.textBaseline = 'top';
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "black";
+
+  var text = didWin ? "You Win!" : "You Lose";
+  var length = ctx.measureText(text).width;
+
+  var xpos = w/2 - length/2
+  var ypos = h/2;
+
+  ctx.strokeText(text, xpos, ypos);
+  ctx.fillText(text, xpos, ypos);
+}
