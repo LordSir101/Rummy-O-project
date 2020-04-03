@@ -71,7 +71,6 @@ class Meld {
     } else if (tile.value == first.value && tile.value == last.value) {
       let temp = true;
       for (let i = 0; i < this.tiles.length; i++) {
-        console.log(tile.suit + ", " + this.tiles[i].suit);
         if (tile.suit == this.tiles[i].suit) {
           temp = false;
         }
@@ -100,12 +99,7 @@ class Meld {
     if(tile != this.tiles[0] && tile != this.tiles[this.tiles.length - 1]){
       return null;
     }
-    /*
 
-    if(!this.checkIfMeldValid(idx)){
-      return null;
-    }
-    else{*/
     var idx = this.tiles.indexOf(tile);
       if(idx == 0 && this.tiles[1] != null){
         this.x = this.tiles[1].x;
@@ -150,26 +144,17 @@ class Meld {
     } else if (tile.value == first.value && tile.value == last.value) {
       var temp = true;
       for (let i = 0; i < this.tiles.length; i++) {
-        console.log(tile.suit + ", " + this.tiles[i].suit);
         if (tile.suit == this.tiles[i].suit) {
           temp = false;
         }
       }
-      console.log(temp);
       return temp;
     }
     return false;
   }
 
   checkIfMeldValid(){
-    /*
-    var test = [];
-    this.tiles.forEach((tile) => {
-      test.push(tile);
-    });
 
-    test.splice(idx, 1);*/
-    //console.log(test);
     var test = [];
     this.tiles.forEach((tile) => {
       test.push(tile);
@@ -209,19 +194,12 @@ class Meld {
 
     }
 
-    //a set of consecutive numbers will have the same mean and median
-    console.log(mean);
-    console.log(median);
-    console.log(sameSuit);
-    console.log(test.length);
     //a meld of 0 will be valid but invisible
     if(mean == median && sameSuit && test.length >= 3){
-      console.log("valid")
       return true;
     }
     //check for a three of a kind of different suit
     else if(!sameSuit && sameVal && test.length >= 3){
-      console.log("valid")
       return true;
     }
     return false;
