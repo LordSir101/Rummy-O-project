@@ -101,7 +101,6 @@ describe('Remove a start or end tile from a meld', () => {
     let m = new Meld(c1);
     m.addTile(c2, [], 0);
     m.addTile(c3, [], 0);
-    console.log(m.tiles);
     let result1 = m.removeTile(m.tiles[1]);
     let result2 = m.tiles;
     expect(result1).toEqual(null);
