@@ -86,7 +86,6 @@ class GameView {
     this.deck.createDeck();
     this.deck.shuffle();
     this.players[0].isTurn = true;
-    this.players[0].addTile(this.deck.dealJoker());
     this.players.forEach((player, i) => {
       for(var i = 0; i < 14; i++){
         player.addTile(this.deck.deal());

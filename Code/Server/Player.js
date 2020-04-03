@@ -27,14 +27,6 @@ class Player {
     return tile;
   }
 
-  // For testing only
-  removeTile (tile) {
-    const index = this.hand.indexOf(tile);
-    if (index > -1) {
-      this.hand.splice(index, 1);
-    }
-  }
-
   sortHandByValue () {
     this.hand.sort((a, b) => {
       let temp;
