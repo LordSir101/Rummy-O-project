@@ -41,12 +41,6 @@ io.on('connection', (sock) => {
       var gameId = games.size; //this will be the index of the game
       var game = new GameView(waitingPlayers, gameId);
       games.push(game);
-      /*
-      var gameId = games.indexOf(game);
-
-      games.forEach((sock) => {
-        sock.emit("gameId", gameId);
-      });*/
       console.log("players " + players.length);
       console.log("games " + games.length);
       waitingPlayers = [];
@@ -71,22 +65,6 @@ io.on('connection', (sock) => {
     console.log("games " + games.length);
   })
 });
-
-
-
-  /*
-  sock.emit("getCookie");
-  sock.on("sendCookie", addToGame);
-
-});
-
-const addToGame = (id, sock) =>{
-  if(id != ""){
-    games[id].reconnectPlayer(sock);
-  }
-}
-*/
-
 
 // Run the server
 server.on('error', (err) =>{
