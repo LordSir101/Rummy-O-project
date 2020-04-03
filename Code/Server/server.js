@@ -13,7 +13,6 @@ const app = express();
 const port = 3000;
 
 const GameView = require('./GameView');
-const Tile = require('./Tile.js');
 
 var players = [];
 var waitingPlayers = [];
