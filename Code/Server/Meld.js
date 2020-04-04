@@ -96,7 +96,7 @@ class Meld {
 
   removeTile(tile){
 
-    if(tile != this.tiles[0] && tile != this.tiles[this.tiles.length - 1]){
+    if(tile != this.tiles[0] && tile != this.tiles[this.tiles.length - 1] !! this.tiles.length ==1){
       return null;
     }
 
