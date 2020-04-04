@@ -375,6 +375,7 @@ class GameView {
     }
 
     if (player.isFirstTurn && maxValue > 20) {
+      player.isFirstTurn = false;
       canEndTurn = true;
 
     }
