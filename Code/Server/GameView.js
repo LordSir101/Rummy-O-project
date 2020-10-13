@@ -15,7 +15,7 @@ class GameView {
     this.loop;
     this.id = gameId;
     this.gameOver = false;
-    //this.gameId = gameId;
+    
     //set an event listener to start animation loop on each client
     this.sockets.forEach((sock, i) => {
       this.players[i] = new Player(gameId);
